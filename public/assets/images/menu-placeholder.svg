@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f5f0e8"/>
+  <rect x="0" y="0" width="400" height="300" fill="url(#g)"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#faf7f2"/>
+      <stop offset="1" stop-color="#ede8df"/>
+    </linearGradient>
+  </defs>
+  <!-- Cup body -->
+  <path d="M158 130 L170 210 Q200 228 230 210 L242 130 Z" fill="#d4c4a8" opacity=".7"/>
+  <!-- Cup rim -->
+  <ellipse cx="200" cy="130" rx="42" ry="10" fill="#c9b89a" opacity=".8"/>
+  <!-- Steam -->
+  <path d="M185 118 Q181 108 185 98 Q189 88 185 78" stroke="#c4a882" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>
+  <path d="M200 115 Q196 103 200 91 Q204 79 200 68" stroke="#c4a882" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>
+  <path d="M215 118 Q211 108 215 98 Q219 88 215 78" stroke="#c4a882" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>
+  <!-- Saucer -->
+  <ellipse cx="200" cy="214" rx="52" ry="10" fill="#c9b89a" opacity=".6"/>
+  <!-- Handle -->
+  <path d="M242 148 Q268 148 268 172 Q268 196 242 196" stroke="#c9b89a" stroke-width="8" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- Label -->
+  <text x="200" y="262" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#9c8a70" letter-spacing="1" opacity=".8">No image yet</text>
+</svg>
