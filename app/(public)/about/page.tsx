@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 import { unstable_cache } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import { getSiteData } from '@/lib/site'
 import type { Database } from '@/types/database'
 
@@ -9,6 +9,7 @@ export const metadata = { title: 'About Us — Cotch' }
 
 const getAboutGallery = unstable_cache(
   async (): Promise<Database['public']['Tables']['gallery_items']['Row'][]> => {
+    if (!hasAdminSupabaseEnv()) return []
     const supabase = createAdminClient()
     const { data } = await (supabase.from('gallery_items').select('*').eq('is_active', true).order('sort_order') as any)
     return (data as Database['public']['Tables']['gallery_items']['Row'][] | null) ?? []

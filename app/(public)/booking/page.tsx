@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import BookingClient from '@/components/booking/BookingClient'
 import LookupClient from '@/components/lookup/LookupClient'
 
@@ -8,6 +8,7 @@ export const metadata: Metadata = { title: 'Reserve a Table' }
 
 const getFloorTables = unstable_cache(
   async () => {
+    if (!hasAdminSupabaseEnv()) return []
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('floor_tables')

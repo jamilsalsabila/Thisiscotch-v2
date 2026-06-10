@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import { getSiteData } from '@/lib/site'
 import { buildMenuPresentation, type MenuItem } from '@/lib/menu'
 import OrderClient from '@/components/order/OrderClient'
@@ -10,6 +10,7 @@ export const metadata: Metadata = { title: 'Order Online' }
 
 const getMenuItems = unstable_cache(
   async (): Promise<MenuItem[]> => {
+    if (!hasAdminSupabaseEnv()) return []
     const supabase = createAdminClient()
     const { data } = await (supabase
       .from('menu_items')

@@ -4,6 +4,15 @@ import { saveSiteSettings } from '@/app/admin/actions'
 import { getSiteData } from '@/lib/site'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 
+function parseSchedule(value: string | undefined) {
+  if (!value) return {} as Record<string, { is_open: boolean; open: string; close: string }>
+  try {
+    return JSON.parse(value) as Record<string, { is_open: boolean; open: string; close: string }>
+  } catch {
+    return {} as Record<string, { is_open: boolean; open: string; close: string }>
+  }
+}
+
 export default async function AdminSchedulePage() {
   await requireAdminAccess()
   const supabase = createAdminClient()
@@ -11,7 +20,7 @@ export default async function AdminSchedulePage() {
   const { data } = await (supabase.from('site_settings').select('key, value').in('key', ['daily_schedule', 'days_text', 'days_text_id']) as any)
   const map = new Map((((data as Array<{ key: string; value: string }> | null) ?? []).map(item => [item.key, item.value])))
   const rawSchedule = map.get('daily_schedule')
-  const schedule = rawSchedule ? JSON.parse(rawSchedule) as Record<string, { is_open: boolean; open: string; close: string }> : {}
+  const schedule = parseSchedule(rawSchedule)
   const weekdayMap: Record<string, number> = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 }
   const todayShort = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jakarta', weekday: 'short' }).format(new Date())
   const todayIso = weekdayMap[todayShort] ?? 1

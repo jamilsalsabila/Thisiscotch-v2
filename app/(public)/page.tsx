@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { unstable_cache } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import { formatRupiah } from '@/utils/format'
 import { DEFAULT_SITE, getSiteData } from '@/lib/site'
 import LegacyIcon from '@/components/ui/LegacyIcon'
@@ -18,6 +18,16 @@ const getHomeData = unstable_cache(
     totalMenuItems: number
     totalTables: number
   }> => {
+    if (!hasAdminSupabaseEnv()) {
+      return {
+        menuItems: [],
+        gallery: [],
+        reviews: [],
+        totalMenuItems: 0,
+        totalTables: 0,
+      }
+    }
+
     const supabase = createAdminClient()
     const [
       { data: menuItems, count: totalMenuItems },

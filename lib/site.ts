@@ -1,5 +1,5 @@
 import { unstable_cache } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 
 export const DEFAULT_SITE = {
   siteName: 'Cotch',
@@ -124,6 +124,16 @@ function computeOpenState(settings: Map<string, string>) {
 export const getSiteData = unstable_cache(
   async (): Promise<SiteData> => {
     try {
+      if (!hasAdminSupabaseEnv()) {
+        return {
+          ...DEFAULT_SITE,
+          isOpen: true,
+          socialWhatsapp: `https://wa.me/${DEFAULT_SITE.whatsappNumber}`,
+          visitorCount: 0,
+          menuCategories: DEFAULT_MENU_CATEGORIES,
+        }
+      }
+
       const supabase = createAdminClient()
       const { data } = await (supabase.from('site_settings').select('key, value') as any)
       const settings = new Map(((data as Array<{ key: string; value: string }> | null) ?? []).map(item => [item.key, item.value]))

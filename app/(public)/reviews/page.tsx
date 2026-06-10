@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import ReviewsClient from '@/components/reviews/ReviewsClient'
 
 export const metadata: Metadata = { title: 'Customer Reviews' }
 
 const getPublishedReviews = unstable_cache(
   async () => {
+    if (!hasAdminSupabaseEnv()) return []
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('reviews')
