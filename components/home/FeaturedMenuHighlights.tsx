@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { formatRupiah } from '@/utils/format'
 import type { Database } from '@/types/database'
 
@@ -16,12 +16,35 @@ function getVisibleSlides(width: number) {
 export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] }) {
   const [visibleSlides, setVisibleSlides] = useState(3)
   const [page, setPage] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
     const sync = () => setVisibleSlides(getVisibleSlides(window.innerWidth))
     sync()
     window.addEventListener('resize', sync)
     return () => window.removeEventListener('resize', sync)
+  }, [])
+
+  useEffect(() => {
+    const applyLang = (value?: string) => {
+      setLang(value === 'id' ? 'id' : 'en')
+    }
+
+    applyLang(localStorage.getItem('cotch_lang') || 'en')
+
+    const onLangChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
+      if (typeof detail === 'string') {
+        applyLang(detail)
+        return
+      }
+      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
+    }
+
+    document.addEventListener('langChanged', onLangChanged)
+    return () => document.removeEventListener('langChanged', onLangChanged)
   }, [])
 
   const maxPage = useMemo(
@@ -33,12 +56,32 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
     setPage(current => Math.min(current, maxPage))
   }, [maxPage])
 
+  useEffect(() => {
+    if (maxPage <= 0 || paused) return
+
+    timerRef.current = window.setInterval(() => {
+      setPage(current => (current >= maxPage ? 0 : current + 1))
+    }, 4500)
+
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearInterval(timerRef.current)
+      }
+    }
+  }, [maxPage, paused])
+
   const currentIndex = page * visibleSlides
   const slideWidth = 100 / items.length
   const translate = currentIndex * slideWidth
 
   return (
-    <div className="featured-menu" data-aos="fade-up" data-aos-delay="100">
+    <div
+      className="featured-menu"
+      data-aos="fade-up"
+      data-aos-delay="100"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div className="featured-menu__viewport">
         <div
           className="featured-menu__track"
@@ -61,11 +104,11 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
                 </div>
                 <div className="menu-card__body">
                   <div className="menu-card__sub">{item.subcategory ? item.subcategory.charAt(0).toUpperCase() + item.subcategory.slice(1) : ''}</div>
-                  <div className="menu-card__name">{item.name_en}</div>
-                  <div className="menu-card__desc">{item.description_en}</div>
+                  <div className="menu-card__name">{lang === 'id' ? (item.name_id || item.name_en) : item.name_en}</div>
+                  <div className="menu-card__desc">{lang === 'id' ? (item.description_id || item.description_en || '') : (item.description_en || item.description_id || '')}</div>
                   <div className="menu-card__footer">
                     <span className="menu-card__price">{formatRupiah(item.price)}</span>
-                    <Link href="/order" className="menu-card__add" aria-label="Order this">+</Link>
+                    <Link href="/order" className="menu-card__add" aria-label={lang === 'id' ? 'Pesan ini' : 'Order this'} title={lang === 'id' ? 'Pesan ini' : 'Order this'}>+</Link>
                   </div>
                 </div>
               </div>
@@ -79,7 +122,10 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
           <button
             type="button"
             className="featured-menu__nav featured-menu__nav--prev"
-            onClick={() => setPage(current => Math.max(0, current - 1))}
+            onClick={() => {
+              setPaused(true)
+              setPage(current => Math.max(0, current - 1))
+            }}
             disabled={page === 0}
             aria-label="Previous menu highlight"
           >
@@ -91,7 +137,10 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
                 key={index}
                 type="button"
                 className={`featured-menu__dot${page === index ? ' active' : ''}`}
-                onClick={() => setPage(index)}
+                onClick={() => {
+                  setPaused(true)
+                  setPage(index)
+                }}
                 aria-label={`Go to menu highlight page ${index + 1}`}
               />
             ))}
@@ -99,7 +148,10 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
           <button
             type="button"
             className="featured-menu__nav featured-menu__nav--next"
-            onClick={() => setPage(current => Math.min(maxPage, current + 1))}
+            onClick={() => {
+              setPaused(true)
+              setPage(current => Math.min(maxPage, current + 1))
+            }}
             disabled={page === maxPage}
             aria-label="Next menu highlight"
           >

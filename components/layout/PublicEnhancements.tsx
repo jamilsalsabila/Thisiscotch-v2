@@ -19,6 +19,10 @@ declare global {
   }
 }
 
+let galleryLightbox:
+  | { destroy?: () => void; reload?: () => void }
+  | null = null
+
 export default function PublicEnhancements() {
   const pathname = usePathname()
 
@@ -204,7 +208,8 @@ export default function PublicEnhancements() {
 
     const initLightbox = () => {
       if (!window.GLightbox || !document.querySelector('.glightbox')) return
-      window.GLightbox({
+      galleryLightbox?.destroy?.()
+      galleryLightbox = window.GLightbox({
         selector: '.glightbox',
         touchNavigation: true,
         loop: true,
@@ -212,6 +217,8 @@ export default function PublicEnhancements() {
         skin: 'clean',
         openEffect: 'fade',
         closeEffect: 'fade',
+        closeButton: true,
+        moreLength: 0,
       })
     }
 
@@ -270,10 +277,18 @@ export default function PublicEnhancements() {
       }, 50)
     }
 
+    const onGalleryRefresh = () => {
+      window.setTimeout(() => {
+        initLightbox()
+      }, 50)
+    }
+
     document.addEventListener('langChanged', onLangChanged)
+    window.addEventListener('cotch:gallery-refresh', onGalleryRefresh)
     return () => {
       window.clearTimeout(aosRetry)
       document.removeEventListener('langChanged', onLangChanged)
+      window.removeEventListener('cotch:gallery-refresh', onGalleryRefresh)
     }
   }, [pathname])
 

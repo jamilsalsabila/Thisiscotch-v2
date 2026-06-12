@@ -47,6 +47,11 @@ export default function GalleryPageClient({ items }: { items: GalleryItem[] }) {
     [filter, items]
   )
 
+  useEffect(() => {
+    const detail = { lang }
+    window.dispatchEvent(new CustomEvent('cotch:gallery-refresh', { detail }))
+  }, [filter, lang])
+
   if (items.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--muted)', fontSize: '.95rem' }} data-copy-en="No published photos yet. Add some from the admin Gallery page." data-copy-id="Belum ada foto yang dipublikasikan. Tambahkan di halaman admin Gallery.">

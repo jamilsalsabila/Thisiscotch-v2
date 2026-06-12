@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { joinWaitlist, cancelWaitlist } from '@/app/(public)/waitlist/actions'
 import { formatDateDisplay } from '@/utils/format'
@@ -18,13 +18,14 @@ const TODAY = new Date().toISOString().split('T')[0]
 type Result = { waitlistCode: string; position: number; date: string; time: string; name: string; partySize: number }
 
 const HOW_IT_WORKS = [
-  { icon: 'calendar' as const, title: 'Fill in the form', desc: 'Pilih tanggal dan waktu yang kamu inginkan.' },
-  { icon: 'clipboard-list' as const, title: 'Get your waitlist code', desc: 'Simpan kode waitlist kamu untuk referensi.' },
-  { icon: 'chat-bubble' as const, title: "We'll notify you", desc: 'Kami akan menghubungi kamu via WhatsApp begitu ada meja tersedia.' },
-  { icon: 'sparkles' as const, title: 'Come enjoy', desc: 'Datang dan nikmati pengalaman terbaik di Cotch!' },
+  { icon: 'calendar' as const, titleEn: 'Fill in the form', titleId: 'Isi formulir', descEn: 'Choose your preferred date and time.', descId: 'Pilih tanggal dan waktu yang kamu inginkan.' },
+  { icon: 'clipboard-list' as const, titleEn: 'Get your waitlist code', titleId: 'Dapatkan kode waitlist', descEn: 'Save your waitlist code for reference.', descId: 'Simpan kode waitlist kamu untuk referensi.' },
+  { icon: 'chat-bubble' as const, titleEn: "We'll notify you", titleId: 'Kami akan menghubungi', descEn: "We'll contact you via WhatsApp once a table becomes available.", descId: 'Kami akan menghubungi kamu via WhatsApp begitu ada meja tersedia.' },
+  { icon: 'sparkles' as const, titleEn: 'Come enjoy', titleId: 'Datang dan nikmati', descEn: 'Come by and enjoy the best Cotch experience.', descId: 'Datang dan nikmati pengalaman terbaik di Cotch!' },
 ]
 
 export default function WaitlistForm() {
+  const [lang, setLang] = useState<'en' | 'id'>('en')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult]         = useState<Result | null>(null)
   const [error, setError]           = useState('')
@@ -36,6 +37,24 @@ export default function WaitlistForm() {
     partySize: '2', preferredDate: TODAY,
     preferredTime: '12:00', specialRequest: '',
   })
+
+  useEffect(() => {
+    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
+
+    applyLang(localStorage.getItem('cotch_lang') || 'en')
+
+    const onLangChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
+      if (typeof detail === 'string') {
+        applyLang(detail)
+        return
+      }
+      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
+    }
+
+    document.addEventListener('langChanged', onLangChanged)
+    return () => document.removeEventListener('langChanged', onLangChanged)
+  }, [])
 
   function set(field: string) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -58,7 +77,10 @@ export default function WaitlistForm() {
     })
 
     setSubmitting(false)
-    if (!res.success) { setError(res.error ?? 'Terjadi kesalahan.'); return }
+    if (!res.success) {
+      setError(res.error ?? (lang === 'id' ? 'Terjadi kesalahan.' : 'Something went wrong.'))
+      return
+    }
 
     setResult({
       waitlistCode: res.waitlistCode!,
@@ -78,7 +100,11 @@ export default function WaitlistForm() {
     setCancelMsg('')
     const res = await cancelWaitlist(cancelCode)
     setCancelling(false)
-    setCancelMsg(res.success ? 'Removed from waitlist.' : (res.error ?? 'Could not cancel waitlist.'))
+    setCancelMsg(
+      res.success
+        ? (lang === 'id' ? 'Berhasil keluar dari waitlist.' : 'Removed from waitlist.')
+        : (res.error ?? (lang === 'id' ? 'Tidak dapat membatalkan waitlist.' : 'Could not cancel waitlist.'))
+    )
   }
 
   if (result) {
@@ -93,11 +119,11 @@ export default function WaitlistForm() {
             </div>
             <div className="ticket__body">
               {[
-                { k: 'Name', v: result.name },
-                { k: 'Party Size', v: `${result.partySize} pax` },
-                { k: 'Preferred Date', v: formatDateDisplay(result.date) },
-                { k: 'Preferred Time', v: result.time },
-                { k: 'Position', v: `#${result.position} in queue` },
+                { k: lang === 'id' ? 'Nama' : 'Name', v: result.name },
+                { k: lang === 'id' ? 'Jumlah Tamu' : 'Party Size', v: `${result.partySize} pax` },
+                { k: lang === 'id' ? 'Tanggal Pilihan' : 'Preferred Date', v: formatDateDisplay(result.date) },
+                { k: lang === 'id' ? 'Waktu Pilihan' : 'Preferred Time', v: result.time },
+                { k: lang === 'id' ? 'Posisi' : 'Position', v: lang === 'id' ? `#${result.position} dalam antrean` : `#${result.position} in queue` },
               ].map(({ k, v }) => (
                 <div key={k} className="ticket__row">
                   <span className="ticket__key">{k}</span>
@@ -142,7 +168,7 @@ export default function WaitlistForm() {
 
           <div className="form-group">
             <label className="form-label" data-copy-en="Email (optional)" data-copy-id="Email (opsional)">Email (optional)</label>
-            <input className="form-input" type="email" value={form.email} onChange={set('email')} placeholder="your@email.com" />
+            <input className="form-input" type="email" value={form.email} onChange={set('email')} placeholder="your@email.com" data-placeholder-en="your@email.com" data-placeholder-id="email@anda.com" />
           </div>
 
           <div className="form-group">
@@ -186,14 +212,14 @@ export default function WaitlistForm() {
         <div style={{ marginBottom: 28 }}>
           <h3 style={{ marginBottom: 16 }} data-copy-en="How It Works" data-copy-id="Cara Kerjanya">How It Works</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {HOW_IT_WORKS.map(({ icon, title, desc }, i) => (
+            {HOW_IT_WORKS.map(({ icon, titleEn, titleId, descEn, descId }, i) => (
               <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--cream-dark)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--red)' }}>
                   <LegacyIcon name={icon} size={18} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: '.9rem' }}>{title}</div>
-                  <div style={{ fontSize: '.82rem', color: 'var(--muted)' }}>{desc}</div>
+                  <div style={{ fontWeight: 600, fontSize: '.9rem' }}>{lang === 'id' ? titleId : titleEn}</div>
+                  <div style={{ fontSize: '.82rem', color: 'var(--muted)' }}>{lang === 'id' ? descId : descEn}</div>
                 </div>
               </div>
             ))}
@@ -233,7 +259,7 @@ export default function WaitlistForm() {
             </div>
           </form>
           {cancelMsg && (
-            <p style={{ marginTop: 10, fontSize: '.82rem', color: cancelMsg === 'Removed from waitlist.' ? 'var(--muted)' : '#dc2626' }}>
+            <p style={{ marginTop: 10, fontSize: '.82rem', color: cancelMsg === 'Removed from waitlist.' || cancelMsg === 'Berhasil keluar dari waitlist.' ? 'var(--muted)' : '#dc2626' }}>
               {cancelMsg}
             </p>
           )}

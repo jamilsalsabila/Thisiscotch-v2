@@ -338,7 +338,7 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
               <div className="modal" style={{ maxWidth: 560 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <h3 style={{ margin: 0 }} data-copy-en="Write a Review" data-copy-id="Tulis Ulasan">Write a Review</h3>
-                  <button type="button" className="modal-close" onClick={() => setShowForm(false)} aria-label="Close">
+                  <button type="button" className="modal-close" onClick={() => setShowForm(false)} aria-label={lang === 'id' ? 'Tutup' : 'Close'}>
                     <LegacyIcon name="x-mark" size={18} />
                   </button>
                 </div>

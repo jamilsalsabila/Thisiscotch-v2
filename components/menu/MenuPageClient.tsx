@@ -107,8 +107,8 @@ export default function MenuPageClient({
                         <div key={item.id} className="menu-card" data-aos="fade-up">
                           <div className="menu-card__img">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={item.name_en} loading="lazy" />
-                            {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Featured">Featured</span> : null}
+                            <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={lang === 'id' ? (item.name_id || item.name_en) : item.name_en} loading="lazy" />
+                            {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">Featured</span> : null}
                           </div>
                           <div className="menu-card__body">
                             <div className="menu-card__sub">
@@ -118,7 +118,7 @@ export default function MenuPageClient({
                             <div className="menu-card__desc">{lang === 'id' ? (item.description_id || item.description_en) : (item.description_en || item.description_id)}</div>
                             <div className="menu-card__footer">
                               <span className="menu-card__price">{formatRupiah(item.price)}</span>
-                              <Link href="/order" className="menu-card__add" title="Order this" data-title-en="Order this" data-title-id="Pesan ini">+</Link>
+                              <Link href="/order" className="menu-card__add" title="Order this" data-title-en="Order this" data-title-id="Pesan ini" aria-label={lang === 'id' ? 'Pesan ini' : 'Order this'}>+</Link>
                             </div>
                           </div>
                         </div>
@@ -146,8 +146,8 @@ export default function MenuPageClient({
                   <div key={item.id} className="menu-card" data-aos="fade-up">
                     <div className="menu-card__img">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={item.name_en} loading="lazy" />
-                      {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Featured">Featured</span> : null}
+                      <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={lang === 'id' ? (item.name_id || item.name_en) : item.name_en} loading="lazy" />
+                      {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">Featured</span> : null}
                     </div>
                     <div className="menu-card__body">
                       {subcategory && subcategory !== 'general' ? <div className="menu-card__sub">{subcategory}</div> : null}
@@ -155,7 +155,7 @@ export default function MenuPageClient({
                       <div className="menu-card__desc">{lang === 'id' ? (item.description_id || item.description_en) : (item.description_en || item.description_id)}</div>
                       <div className="menu-card__footer">
                         <span className="menu-card__price">{formatRupiah(item.price)}</span>
-                        <Link href="/order" className="menu-card__add" title="Order this" data-title-en="Order this" data-title-id="Pesan ini">+</Link>
+                        <Link href="/order" className="menu-card__add" title="Order this" data-title-en="Order this" data-title-id="Pesan ini" aria-label={lang === 'id' ? 'Pesan ini' : 'Order this'}>+</Link>
                       </div>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { lookupRecord, cancelRecord } from '@/app/(public)/lookup/actions'
 import { formatDateDisplay, formatRupiah } from '@/utils/format'
@@ -8,14 +8,46 @@ import { WordmarkLogo } from '@/components/ui/BrandLogo'
 
 type LookupResult = Awaited<ReturnType<typeof lookupRecord>>
 
-function statusLabel(status: string) {
+function statusLabel(status: string, lang: 'en' | 'id') {
+  const labels: Record<string, { en: string; id: string }> = {
+    active: { en: 'Active', id: 'Aktif' },
+    cancelled: { en: 'Cancelled', id: 'Dibatalkan' },
+    waiting: { en: 'Waiting', id: 'Menunggu' },
+    pending: { en: 'Pending', id: 'Menunggu' },
+    confirmed: { en: 'Confirmed', id: 'Dikonfirmasi' },
+    preparing: { en: 'Preparing', id: 'Disiapkan' },
+    ready: { en: 'Ready', id: 'Siap' },
+    completed: { en: 'Completed', id: 'Selesai' },
+  }
+  const normalized = status.toLowerCase()
+  const match = labels[normalized]
+  if (match) return lang === 'id' ? match.id : match.en
   return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
 export default function LookupClient({ embedded = false }: { embedded?: boolean }) {
+  const [lang, setLang] = useState<'en' | 'id'>('en')
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<LookupResult | null>(null)
+
+  useEffect(() => {
+    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
+
+    applyLang(localStorage.getItem('cotch_lang') || 'en')
+
+    const onLangChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
+      if (typeof detail === 'string') {
+        applyLang(detail)
+        return
+      }
+      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
+    }
+
+    document.addEventListener('langChanged', onLangChanged)
+    return () => document.removeEventListener('langChanged', onLangChanged)
+  }, [])
 
   async function handleLookup() {
     setLoading(true)
@@ -89,21 +121,21 @@ export default function LookupClient({ embedded = false }: { embedded?: boolean 
             <div className="ticket__code">{result.data.booking_code}</div>
           </div>
           <div className="ticket__body">
-            <TicketRow label="Guest" value={result.data.guest_name} />
-            <TicketRow label="Table" value={result.data.table_id} />
-            <TicketRow label="Section" value={result.data.section ?? '—'} />
-            <TicketRow label="Party" value={`${result.data.party_size} pax`} />
-            <TicketRow label="Date" value={formatDateDisplay(result.data.booking_date)} />
-            <TicketRow label="Time" value={result.data.booking_time} />
+            <TicketRow label={lang === 'id' ? 'Tamu' : 'Guest'} value={result.data.guest_name} />
+            <TicketRow label={lang === 'id' ? 'Meja' : 'Table'} value={result.data.table_id} />
+            <TicketRow label={lang === 'id' ? 'Area' : 'Section'} value={result.data.section ?? '—'} />
+            <TicketRow label={lang === 'id' ? 'Jumlah Tamu' : 'Party'} value={`${result.data.party_size} pax`} />
+            <TicketRow label={lang === 'id' ? 'Tanggal' : 'Date'} value={formatDateDisplay(result.data.booking_date)} />
+            <TicketRow label={lang === 'id' ? 'Waktu' : 'Time'} value={result.data.booking_time} />
             <div className="ticket__row">
               <span className="ticket__key">Status</span>
               <span className="ticket__val">
                 <span className={`ticket__status ${result.data.status === 'active' ? 'active' : 'cancelled'}`}>
-                  ● {statusLabel(result.data.status)}
+                  ● {statusLabel(result.data.status, lang)}
                 </span>
               </span>
             </div>
-            {result.data.special_request && <TicketRow label="Notes" value={result.data.special_request} />}
+            {result.data.special_request && <TicketRow label={lang === 'id' ? 'Catatan' : 'Notes'} value={result.data.special_request} />}
           </div>
           <div className="ticket__footer">
             {result.data.status === 'active' ? (
@@ -132,16 +164,16 @@ export default function LookupClient({ embedded = false }: { embedded?: boolean 
             <div className="ticket__code">{result.data.waitlist_code}</div>
           </div>
           <div className="ticket__body">
-            <TicketRow label="Name" value={result.data.guest_name} />
-            <TicketRow label="Party Size" value={`${result.data.party_size} pax`} />
-            <TicketRow label="Preferred Date" value={formatDateDisplay(result.data.preferred_date)} />
-            <TicketRow label="Preferred Time" value={result.data.preferred_time} />
-            <TicketRow label="Queue Position" value={`#${result.data.position}`} />
+            <TicketRow label={lang === 'id' ? 'Nama' : 'Name'} value={result.data.guest_name} />
+            <TicketRow label={lang === 'id' ? 'Jumlah Tamu' : 'Party Size'} value={`${result.data.party_size} pax`} />
+            <TicketRow label={lang === 'id' ? 'Tanggal Pilihan' : 'Preferred Date'} value={formatDateDisplay(result.data.preferred_date)} />
+            <TicketRow label={lang === 'id' ? 'Waktu Pilihan' : 'Preferred Time'} value={result.data.preferred_time} />
+            <TicketRow label={lang === 'id' ? 'Posisi Antrean' : 'Queue Position'} value={`#${result.data.position}`} />
             <div className="ticket__row">
               <span className="ticket__key">Status</span>
               <span className="ticket__val">
                 <span className={`ticket__status ${result.data.status === 'waiting' ? 'active' : 'cancelled'}`}>
-                  ● {statusLabel(result.data.status)}
+                  ● {statusLabel(result.data.status, lang)}
                 </span>
               </span>
             </div>
@@ -167,8 +199,8 @@ export default function LookupClient({ embedded = false }: { embedded?: boolean 
             <div className="ticket__code">{result.data.order_code}</div>
           </div>
           <div className="ticket__body">
-            <TicketRow label="Name" value={result.data.guest_name} />
-            <TicketRow label="Table" value={result.data.table_number || '—'} />
+            <TicketRow label={lang === 'id' ? 'Nama' : 'Name'} value={result.data.guest_name} />
+            <TicketRow label={lang === 'id' ? 'Meja' : 'Table'} value={result.data.table_number || '—'} />
             <div style={{ padding: '8px 0', borderBottom: '1px dashed var(--border)' }}>
               {(result.data.order_items as Array<{ id: number; item_name: string; quantity: number; subtotal: number }>).map(item => (
                 <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.85rem', padding: '4px 0' }}>
@@ -182,7 +214,7 @@ export default function LookupClient({ embedded = false }: { embedded?: boolean 
               <span className="ticket__key">Status</span>
               <span className="ticket__val">
                 <span className={`ticket__status ${['pending', 'confirmed'].includes(result.data.status) ? 'active' : 'cancelled'}`}>
-                  ● {statusLabel(result.data.status)}
+                  ● {statusLabel(result.data.status, lang)}
                 </span>
               </span>
             </div>
@@ -198,7 +230,7 @@ export default function LookupClient({ embedded = false }: { embedded?: boolean 
               </>
             ) : (
               <>
-                <p><span data-copy-en="Status:" data-copy-id="Status:">Status:</span> {result.data.status}</p>
+                <p><span data-copy-en="Status:" data-copy-id="Status:">Status:</span> {statusLabel(result.data.status, lang)}</p>
                 <Link href={`/reviews?code=${result.data.order_code}`} className="btn btn--outline btn--sm" style={{ marginTop: 12 }}><span data-copy-en="Leave a Review" data-copy-id="Tinggalkan Ulasan">Leave a Review</span></Link>
               </>
             )}
