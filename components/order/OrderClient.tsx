@@ -154,7 +154,7 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
             <div key={item.id} className="menu-card" data-aos="fade-up">
               <div className="menu-card__img">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={getItemImage(item)} alt={item.name_en} loading="lazy" />
+                <img src={getItemImage(item)} alt={lang === 'id' ? (item.name_id || item.name_en) : item.name_en} loading="lazy" />
                 {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">Featured</span> : null}
               </div>
               <div className="menu-card__body">
@@ -181,6 +181,7 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
                       title={lang === 'id' ? 'Tambahkan ke order' : 'Add to order'}
                       data-title-en="Add to order"
                       data-title-id="Tambahkan ke order"
+                      aria-label={lang === 'id' ? 'Tambahkan ke order' : 'Add to order'}
                     >
                       +
                     </button>
@@ -379,7 +380,19 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <strong>{lookupResult.data.order_code}</strong>
                 <span style={{ color: statusColor(lookupResult.data.status), fontWeight: 700, fontSize: '.82rem', textTransform: 'capitalize' }}>
-                  ● {lookupResult.data.status}
+                  ● {lookupResult.data.status === 'pending'
+                    ? (lang === 'id' ? 'menunggu' : 'pending')
+                    : lookupResult.data.status === 'confirmed'
+                      ? (lang === 'id' ? 'dikonfirmasi' : 'confirmed')
+                      : lookupResult.data.status === 'preparing'
+                        ? (lang === 'id' ? 'disiapkan' : 'preparing')
+                        : lookupResult.data.status === 'ready'
+                          ? (lang === 'id' ? 'siap' : 'ready')
+                          : lookupResult.data.status === 'completed'
+                            ? (lang === 'id' ? 'selesai' : 'completed')
+                            : lookupResult.data.status === 'cancelled'
+                              ? (lang === 'id' ? 'dibatalkan' : 'cancelled')
+                              : lookupResult.data.status}
                 </span>
               </div>
               <p style={{ fontSize: '.82rem', color: 'var(--muted)' }}>
