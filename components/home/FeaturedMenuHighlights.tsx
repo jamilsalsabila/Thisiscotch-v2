@@ -25,7 +25,7 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
   }, [])
 
   const maxPage = useMemo(
-    () => Math.max(0, items.length - visibleSlides),
+    () => Math.max(0, Math.ceil(items.length / visibleSlides) - 1),
     [items.length, visibleSlides]
   )
 
@@ -33,8 +33,9 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
     setPage(current => Math.min(current, maxPage))
   }, [maxPage])
 
-  const slideWidth = 100 / visibleSlides
-  const translate = page * slideWidth
+  const currentIndex = page * visibleSlides
+  const slideWidth = 100 / items.length
+  const translate = currentIndex * slideWidth
 
   return (
     <div className="featured-menu" data-aos="fade-up" data-aos-delay="100">
