@@ -191,7 +191,7 @@ export default async function HomePage() {
             <div className="text-center" style={{ marginBottom: 48 }} data-aos="fade-up">
               <div className="section-label" data-copy-en="Menu Highlights" data-copy-id="Sorotan Menu">Menu Highlights</div>
               <h2 className="section-title" data-copy-en="Our Menu" data-copy-id="Menu Kami">Our Menu</h2>
-              <p className="section-desc" style={{ margin: '0 auto' }} data-copy-en="Carefully crafted drinks to match any mood. Food and pastry coming soon." data-copy-id="Minuman yang diracik dengan hati untuk setiap suasana. Menu makanan & pastry segera hadir.">Carefully crafted drinks to match any mood. Food and pastry coming soon.</p>
+              <p className="section-desc" style={{ margin: '0 auto' }} data-copy-en="Carefully crafted drinks to match any mood." data-copy-id="Minuman yang diracik dengan hati untuk setiap suasana.">Carefully crafted drinks to match any mood.</p>
             </div>
 
           {menuItems && menuItems.length > 0 ? (

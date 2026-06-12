@@ -1183,32 +1183,8 @@ span.flatpickr-weekday {
 /* Featured menu Swiper */
 .featured-swiper .swiper-slide { height: auto; }
 .featured-swiper .swiper-wrapper { align-items: stretch; }
-.featured-swiper .menu-card {
-  height: 100%;
-  max-width: 320px;
-  margin: 0 auto;
-}
-.featured-swiper .menu-card__img {
-  aspect-ratio: 4 / 2.8;
-}
-.featured-swiper .menu-card__body {
-  padding: 16px;
-}
-.featured-swiper .menu-card__name {
-  font-size: 1rem;
-}
-.featured-swiper .menu-card__desc {
-  font-size: .78rem;
-  line-height: 1.45;
-}
-.featured-swiper {
-  padding: 4px 2px 52px !important;
-}
-.featured-swiper .swiper-button-prev,
-.featured-swiper .swiper-button-next {
-  top: 42%;
-  z-index: 5;
-}
+.featured-swiper .menu-card { height: 100%; }
+.featured-swiper { padding-bottom: 44px !important; }
 
 /* Hero background Swiper */
 .hero-bg-swiper { position: absolute; inset: 0; z-index: 0; }

@@ -218,31 +218,32 @@ export default function PublicEnhancements() {
     const initSwipers = () => {
       if (!window.Swiper) return
 
-      document.querySelectorAll('.featured-swiper').forEach(node => {
-        if ((node as HTMLElement).dataset.swiperReady === 'true') return
-        ;(node as HTMLElement).dataset.swiperReady = 'true'
-        new window.Swiper!(node, {
-          slidesPerView: 1.15,
-          spaceBetween: 16,
-          loop: false,
-          grabCursor: true,
-          watchOverflow: true,
-          centeredSlides: false,
+      const featured = document.querySelector('.featured-swiper') as HTMLElement | null
+      if (featured && featured.dataset.swiperReady !== 'true') {
+        featured.dataset.swiperReady = 'true'
+        new window.Swiper!('.featured-swiper', {
+          slidesPerView: 1,
+          spaceBetween: 20,
+          loop: true,
+          autoplay: {
+            delay: 4500,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          },
           pagination: {
-            el: node.querySelector('.swiper-pagination'),
+            el: '.featured-swiper .swiper-pagination',
             clickable: true,
           },
           navigation: {
-            nextEl: node.querySelector('.swiper-button-next'),
-            prevEl: node.querySelector('.swiper-button-prev'),
+            nextEl: '.featured-swiper .swiper-button-next',
+            prevEl: '.featured-swiper .swiper-button-prev',
           },
           breakpoints: {
-            640: { slidesPerView: 1.6, spaceBetween: 18 },
-            900: { slidesPerView: 2.15, spaceBetween: 20 },
-            1200: { slidesPerView: 2.6, spaceBetween: 24 },
+            580: { slidesPerView: 2 },
+            900: { slidesPerView: 3 },
           },
         })
-      })
+      }
     }
 
     const bindModalBackdrop = () => {
