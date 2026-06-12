@@ -99,7 +99,7 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
               <div className="menu-card featured-menu__card" style={{ position: 'relative' }}>
                 <div className="menu-card__img">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={item.name_en} loading="lazy" />
+                  <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={lang === 'id' ? (item.name_id || item.name_en) : item.name_en} loading="lazy" />
                   {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">Featured</span> : null}
                 </div>
                 <div className="menu-card__body">
@@ -127,7 +127,7 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
               setPage(current => Math.max(0, current - 1))
             }}
             disabled={page === 0}
-            aria-label="Previous menu highlight"
+            aria-label={lang === 'id' ? 'Sorotan menu sebelumnya' : 'Previous menu highlight'}
           >
             ‹
           </button>
@@ -141,7 +141,7 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
                   setPaused(true)
                   setPage(index)
                 }}
-                aria-label={`Go to menu highlight page ${index + 1}`}
+                aria-label={lang === 'id' ? `Buka halaman sorotan menu ${index + 1}` : `Go to menu highlight page ${index + 1}`}
               />
             ))}
           </div>
@@ -153,7 +153,7 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
               setPage(current => Math.min(maxPage, current + 1))
             }}
             disabled={page === maxPage}
-            aria-label="Next menu highlight"
+            aria-label={lang === 'id' ? 'Sorotan menu berikutnya' : 'Next menu highlight'}
           >
             ›
           </button>

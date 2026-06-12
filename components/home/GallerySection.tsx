@@ -53,6 +53,15 @@ export default function GallerySection({ items }: { items: GalleryItem[] }) {
             key={item.id}
             className={`gallery-item${SIZES[i % SIZES.length] ? ' ' + SIZES[i % SIZES.length] : ''}`}
             onClick={() => setLightbox(i)}
+            role="button"
+            tabIndex={0}
+            aria-label={lang === 'id' ? `Buka foto ${item.alt_id}` : `Open photo ${(item.alt_en || item.alt_id)}`}
+            onKeyDown={event => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                setLightbox(i)
+              }
+            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={item.src} alt={lang === 'id' ? item.alt_id : (item.alt_en || item.alt_id)} loading="lazy" />
@@ -68,12 +77,12 @@ export default function GallerySection({ items }: { items: GalleryItem[] }) {
         <div className="lightbox active" onClick={() => setLightbox(null)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="lightbox__img" src={current.src} alt={lang === 'id' ? current.alt_id : (current.alt_en || current.alt_id)} onClick={e => e.stopPropagation()} />
-          <button className="lightbox__close" onClick={() => setLightbox(null)}><XMarkIcon style={{ width: 22, height: 22 }} /></button>
+          <button className="lightbox__close" onClick={() => setLightbox(null)} aria-label={lang === 'id' ? 'Tutup galeri' : 'Close gallery'}><XMarkIcon style={{ width: 22, height: 22 }} /></button>
           {lightbox! > 0 && (
-            <button className="lightbox__nav lightbox__nav--prev" onClick={e => { e.stopPropagation(); setLightbox(l => l! - 1) }}><ChevronLeftIcon style={{ width: 28, height: 28 }} /></button>
+            <button className="lightbox__nav lightbox__nav--prev" onClick={e => { e.stopPropagation(); setLightbox(l => l! - 1) }} aria-label={lang === 'id' ? 'Foto sebelumnya' : 'Previous photo'}><ChevronLeftIcon style={{ width: 28, height: 28 }} /></button>
           )}
           {lightbox! < items.length - 1 && (
-            <button className="lightbox__nav lightbox__nav--next" onClick={e => { e.stopPropagation(); setLightbox(l => l! + 1) }}><ChevronRightIcon style={{ width: 28, height: 28 }} /></button>
+            <button className="lightbox__nav lightbox__nav--next" onClick={e => { e.stopPropagation(); setLightbox(l => l! + 1) }} aria-label={lang === 'id' ? 'Foto berikutnya' : 'Next photo'}><ChevronRightIcon style={{ width: 28, height: 28 }} /></button>
           )}
         </div>
       )}
