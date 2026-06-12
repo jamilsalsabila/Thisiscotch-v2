@@ -333,14 +333,6 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
         </div>
       ) : (
         <>
-          {!showForm ? (
-            <div style={{ textAlign: 'center' }}>
-              <button className="btn btn--primary" onClick={() => setShowForm(true)}>
-                <LegacyIcon name="pencil" size={16} style={{ display: 'inline', verticalAlign: 'middle' }} /> <span data-copy-en="Write a Review" data-copy-id="Tulis Ulasan">Write a Review</span>
-              </button>
-            </div>
-          ) : null}
-
           {showForm ? (
             <div className="modal-backdrop active" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
               <div className="modal" style={{ maxWidth: 560 }}>

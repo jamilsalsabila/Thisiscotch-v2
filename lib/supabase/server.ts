@@ -2,17 +2,32 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
 
+function normalizeEnvValue(value: string | undefined) {
+  const trimmed = value?.trim() ?? ''
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim()
+  }
+  return trimmed
+}
+
 function getPublicSupabaseEnv() {
   return {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? '',
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? '',
+    url: normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    anonKey: normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
   }
 }
 
 function getAdminSupabaseEnv() {
   return {
     ...getPublicSupabaseEnv(),
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? '',
+    serviceRoleKey:
+      normalizeEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY) ||
+      normalizeEnvValue(process.env.SUPABASE_SERVICE_KEY) ||
+      normalizeEnvValue(process.env.SUPABASE_SECRET_KEY) ||
+      normalizeEnvValue(process.env.SUPABASE_SECRET),
   }
 }
 
@@ -58,7 +73,7 @@ export function createAdminClient() {
   const { url, serviceRoleKey } = getAdminSupabaseEnv()
 
   if (!url || !serviceRoleKey) {
-    throw new Error('Supabase admin environment variables are required.')
+    throw new Error('Supabase admin environment variables are required. Checked SUPABASE_SERVICE_ROLE_KEY, SUPABASE_SERVICE_KEY, SUPABASE_SECRET_KEY, and SUPABASE_SECRET.')
   }
 
   return createClient(

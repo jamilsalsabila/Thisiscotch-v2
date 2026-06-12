@@ -264,7 +264,8 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
   min-height: 100vh;
   display: flex; align-items: center;
   position: relative; overflow: hidden;
-  padding-top: var(--nav-h);
+  margin-top: calc(var(--nav-h) * -1);
+  padding-top: 0;
 }
 .hero__bg {
   position: absolute; inset: 0; z-index: 0;
@@ -726,20 +727,20 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
 
 /* ── Location section ──────────────────────────── */
 .location-content {
-  text-align: center;
+  text-align: left;
 }
 .location-content .section-label {
   margin-bottom: 12px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .location-content .section-title {
-  text-align: center;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  text-align: left;
+  width: auto;
+  margin-left: 0;
+  margin-right: 0;
 }
 .location-info {
-  display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; align-items: center;
+  display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; align-items: flex-start;
 }
 .location-info__row {
   display: flex; gap: 12px; align-items: flex-start; justify-content: flex-start; width: min(100%, 420px); text-align: left;
@@ -748,7 +749,7 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
 .location-info__name { font-weight: 600; font-size: .9rem; margin-bottom: 2px; }
 .location-info__sub  { color: var(--muted); font-size: .82rem; }
 .location-info__hours { font-size: .9rem; margin-top: 1px; }
-.location-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.location-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-start; }
 .date-row       { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .rev-summary {
   display: flex;
