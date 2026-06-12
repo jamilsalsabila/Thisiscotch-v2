@@ -77,7 +77,7 @@ export default async function HomePage() {
               >
                 {site.isOpen ? 'Open Now' : 'Closed'}
               </span>
-              <div className="hero__weather" id="weatherBadge" style={{ display: 'none' }} title="Current weather in Bandung">
+              <div className="hero__weather" id="weatherBadge" title="Current weather in Bandung">
                 <span id="wIcon">🌡️</span>
                 <span id="wTemp">—°C</span>
                 <span id="wCity">Bandung</span>

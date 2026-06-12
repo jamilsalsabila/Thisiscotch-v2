@@ -164,6 +164,8 @@ export default function PublicEnhancements() {
       const badge = document.getElementById('weatherBadge')
       if (!badge) return
 
+      ;(badge as HTMLElement).style.display = 'inline-flex'
+
       try {
         const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.9175&longitude=107.6191&current=temperature_2m,weather_code&timezone=Asia%2FJakarta', { cache: 'no-store' })
         const data = await response.json()
@@ -189,9 +191,14 @@ export default function PublicEnhancements() {
         if (tempEl) tempEl.textContent = `${temp}°C`
         if (cityEl) cityEl.textContent = 'Bandung'
         badge.setAttribute('title', `${match.desc} · ${temp}°C · Bandung`)
-        ;(badge as HTMLElement).style.display = 'inline-flex'
       } catch {
-        ;(badge as HTMLElement).style.display = 'none'
+        const iconEl = document.getElementById('wIcon')
+        const tempEl = document.getElementById('wTemp')
+        const cityEl = document.getElementById('wCity')
+        if (iconEl) iconEl.textContent = '☕'
+        if (tempEl) tempEl.textContent = 'Bandung'
+        if (cityEl) cityEl.textContent = 'Today'
+        badge.setAttribute('title', 'Bandung')
       }
     }
 

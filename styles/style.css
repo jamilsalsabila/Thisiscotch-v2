@@ -279,7 +279,7 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
 }
 .hero__inner {
   position: relative; z-index: 1;
-  max-width: 1140px; margin: 0 auto; padding: 80px 24px;
+  max-width: 1140px; margin: 0 auto; padding: calc(var(--nav-h) + 32px) 24px 80px;
   display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
 }
 .hero__tag {
@@ -952,7 +952,7 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
   .grid-halves    { grid-template-columns: 1fr; }
 
   /* ─ Hero ─ */
-  .hero__inner    { padding: 48px 16px 40px; }
+  .hero__inner    { padding: calc(var(--nav-h) + 24px) 16px 40px; }
   .hero__stats    { gap: 20px; flex-wrap: wrap; justify-content: center; }
   .hero__stat-num { font-size: 1.5rem; }
   .hero__tag      { font-size: .72rem; }
