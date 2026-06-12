@@ -32,6 +32,26 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
+    const syncLang = (value?: string) => setLang(value === 'id' ? 'ID' : 'EN')
+
+    const onLangChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
+      if (typeof detail === 'string') {
+        syncLang(detail)
+        return
+      }
+      syncLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
+    }
+
+    document.addEventListener('langChanged', onLangChanged)
+    window.addEventListener('storage', onLangChanged as EventListener)
+    return () => {
+      document.removeEventListener('langChanged', onLangChanged)
+      window.removeEventListener('storage', onLangChanged as EventListener)
+    }
+  }, [])
+
+  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -73,12 +93,12 @@ export default function Navbar() {
         </ul>
 
         <div className="nav__actions">
-          <div className="nav__lang" aria-label="Language selector">
+          <div className="nav__lang" aria-label={lang === 'ID' ? 'Pemilih bahasa' : 'Language selector'}>
             <button className={lang === 'EN' ? 'active' : ''} data-lang="en" onClick={() => toggleLang('EN')}>EN</button>
             <button className={lang === 'ID' ? 'active' : ''} data-lang="id" onClick={() => toggleLang('ID')}>ID</button>
           </div>
 
-          <button className="nav__theme" onClick={toggleDark} aria-label="Toggle dark mode">
+          <button className="nav__theme" onClick={toggleDark} aria-label={lang === 'ID' ? 'Ubah mode gelap' : 'Toggle dark mode'}>
             {dark ? <LegacyIcon name="sun" size={16} /> : <LegacyIcon name="moon" size={16} />}
           </button>
 
@@ -89,7 +109,7 @@ export default function Navbar() {
           <button
             className={`nav__hamburger${menuOpen ? ' open' : ''}`}
             onClick={() => setMenuOpen(o => !o)}
-            aria-label="Menu"
+            aria-label={lang === 'ID' ? 'Menu navigasi' : 'Navigation menu'}
           >
             {menuOpen ? <LegacyIcon name="x-mark" size={20} /> : <Bars3Icon style={{ width: 20, height: 20 }} />}
           </button>
