@@ -16,7 +16,9 @@ function normalizeEnvValue(value: string | undefined) {
 function getPublicSupabaseEnv() {
   return {
     url: normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL),
-    anonKey: normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    anonKey:
+      normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ||
+      normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
   }
 }
 
@@ -24,6 +26,7 @@ function getAdminSupabaseEnv() {
   return {
     ...getPublicSupabaseEnv(),
     serviceRoleKey:
+      normalizeEnvValue(process.env.SUPABASE_SECRET_KEY) ||
       normalizeEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY) ||
       normalizeEnvValue(process.env.SUPABASE_SERVICE_KEY) ||
       normalizeEnvValue(process.env.SUPABASE_SECRET_KEY) ||
@@ -73,7 +76,7 @@ export function createAdminClient() {
   const { url, serviceRoleKey } = getAdminSupabaseEnv()
 
   if (!url || !serviceRoleKey) {
-    throw new Error('Supabase admin environment variables are required. Checked SUPABASE_SERVICE_ROLE_KEY, SUPABASE_SERVICE_KEY, SUPABASE_SECRET_KEY, and SUPABASE_SECRET.')
+    throw new Error('Supabase admin environment variables are required. Checked SUPABASE_SECRET_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_SERVICE_KEY, SUPABASE_SECRET_KEY, and SUPABASE_SECRET.')
   }
 
   return createClient(

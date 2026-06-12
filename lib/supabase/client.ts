@@ -14,7 +14,9 @@ export function createClient() {
   }
 
   const url = normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL)
-  const anonKey = normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  const anonKey =
+    normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ||
+    normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
   if (!url || !anonKey) {
     throw new Error('Supabase public environment variables are required.')
