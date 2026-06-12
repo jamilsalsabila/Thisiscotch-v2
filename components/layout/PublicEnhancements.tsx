@@ -222,9 +222,12 @@ export default function PublicEnhancements() {
         if ((node as HTMLElement).dataset.swiperReady === 'true') return
         ;(node as HTMLElement).dataset.swiperReady = 'true'
         new window.Swiper!(node, {
-          slidesPerView: 1.1,
-          spaceBetween: 18,
+          slidesPerView: 1.15,
+          spaceBetween: 16,
           loop: false,
+          grabCursor: true,
+          watchOverflow: true,
+          centeredSlides: false,
           pagination: {
             el: node.querySelector('.swiper-pagination'),
             clickable: true,
@@ -234,8 +237,9 @@ export default function PublicEnhancements() {
             prevEl: node.querySelector('.swiper-button-prev'),
           },
           breakpoints: {
-            640: { slidesPerView: 2, spaceBetween: 20 },
-            1024: { slidesPerView: 3, spaceBetween: 24 },
+            640: { slidesPerView: 1.6, spaceBetween: 18 },
+            900: { slidesPerView: 2.15, spaceBetween: 20 },
+            1200: { slidesPerView: 2.6, spaceBetween: 24 },
           },
         })
       })

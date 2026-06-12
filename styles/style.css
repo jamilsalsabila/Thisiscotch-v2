@@ -1183,8 +1183,32 @@ span.flatpickr-weekday {
 /* Featured menu Swiper */
 .featured-swiper .swiper-slide { height: auto; }
 .featured-swiper .swiper-wrapper { align-items: stretch; }
-.featured-swiper .menu-card { height: 100%; }
-.featured-swiper { padding-bottom: 44px !important; }
+.featured-swiper .menu-card {
+  height: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.featured-swiper .menu-card__img {
+  aspect-ratio: 4 / 2.8;
+}
+.featured-swiper .menu-card__body {
+  padding: 16px;
+}
+.featured-swiper .menu-card__name {
+  font-size: 1rem;
+}
+.featured-swiper .menu-card__desc {
+  font-size: .78rem;
+  line-height: 1.45;
+}
+.featured-swiper {
+  padding: 4px 2px 52px !important;
+}
+.featured-swiper .swiper-button-prev,
+.featured-swiper .swiper-button-next {
+  top: 42%;
+  z-index: 5;
+}
 
 /* Hero background Swiper */
 .hero-bg-swiper { position: absolute; inset: 0; z-index: 0; }
@@ -1197,6 +1221,13 @@ span.flatpickr-weekday {
   background: rgba(255,255,255,.15) !important;
   border-radius: 50% !important;
   width: 40px !important; height: 40px !important;
+  top: 18px !important;
+  right: 18px !important;
+  opacity: 1 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.28) !important;
+  z-index: 9999 !important;
 }
 .glightbox-clean .gnext,
 .glightbox-clean .gprev {
@@ -1204,6 +1235,13 @@ span.flatpickr-weekday {
   border-radius: 50% !important;
   width: 44px !important; height: 44px !important;
   border: none !important;
+}
+.glightbox-clean .gclose svg,
+.glightbox-clean .gnext svg,
+.glightbox-clean .gprev svg {
+  display: block !important;
+  stroke: #fff !important;
+  fill: none !important;
 }
 .gslide-description { background: rgba(0,0,0,.7) !important; font-family: var(--font-body) !important; }
 
