@@ -6,6 +6,7 @@ import { DEFAULT_SITE, getSiteData } from '@/lib/site'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 import type { Database } from '@/types/database'
 import GallerySection from '@/components/home/GallerySection'
+import FeaturedMenuHighlights from '@/components/home/FeaturedMenuHighlights'
 import {
   MapPinIcon,
   ClockIcon,
@@ -195,33 +196,7 @@ export default async function HomePage() {
             </div>
 
           {menuItems && menuItems.length > 0 ? (
-            <div className="swiper featured-swiper" data-aos="fade-up" data-aos-delay="100">
-              <div className="swiper-wrapper">
-                {menuItems.map(item => (
-                  <div key={item.id} className="swiper-slide">
-                    <div className="menu-card" style={{ position: 'relative' }}>
-                      <div className="menu-card__img">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={item.image || '/assets/images/menu-placeholder.svg'} alt={item.name_en} loading="lazy" />
-                        {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">Featured</span> : null}
-                      </div>
-                      <div className="menu-card__body">
-                        <div className="menu-card__sub">{item.subcategory ? item.subcategory.charAt(0).toUpperCase() + item.subcategory.slice(1) : ''}</div>
-                        <div className="menu-card__name">{item.name_en}</div>
-                        <div className="menu-card__desc">{item.description_en}</div>
-                        <div className="menu-card__footer">
-                          <span className="menu-card__price">{formatRupiah(item.price)}</span>
-                          <Link href="/order" className="menu-card__add" aria-label="Order this">+</Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="swiper-pagination" />
-              <div className="swiper-button-prev" />
-              <div className="swiper-button-next" />
-            </div>
+            <FeaturedMenuHighlights items={menuItems} />
           ) : (
             <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)' }}>
               <p><span data-copy-en="Menu will be available soon." data-copy-id="Menu akan segera tersedia.">Menu will be available soon.</span> <Link href="/order" style={{ color: 'var(--red)' }}>Check full menu →</Link></p>
