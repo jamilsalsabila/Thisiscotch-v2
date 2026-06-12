@@ -130,8 +130,11 @@ export default function PublicEnhancements() {
 
   useEffect(() => {
     const initAos = () => {
+      if (!document.querySelector('[data-aos]')) {
+        document.body.classList.add('aos-ready')
+        return
+      }
       if (!window.AOS) return
-      if (!document.querySelector('[data-aos]')) return
       window.AOS.init({
         duration: 650,
         once: true,
@@ -140,6 +143,7 @@ export default function PublicEnhancements() {
         disable: false,
       })
       window.AOS.refreshHard?.()
+      document.body.classList.add('aos-ready')
     }
 
     const initCountUp = () => {
@@ -239,6 +243,9 @@ export default function PublicEnhancements() {
     }
 
     initAos()
+    const aosRetry = window.setTimeout(() => {
+      if (!document.body.classList.contains('aos-ready')) initAos()
+    }, 250)
     initCountUp()
     initWeather()
     initLightbox()
@@ -253,6 +260,7 @@ export default function PublicEnhancements() {
 
     document.addEventListener('langChanged', onLangChanged)
     return () => {
+      window.clearTimeout(aosRetry)
       document.removeEventListener('langChanged', onLangChanged)
     }
   }, [pathname])

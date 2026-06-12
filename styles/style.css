@@ -734,6 +734,9 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
 }
 .location-content .section-title {
   text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 .location-info {
   display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; align-items: center;
@@ -1203,7 +1206,12 @@ span.flatpickr-weekday {
 }
 .gslide-description { background: rgba(0,0,0,.7) !important; font-family: var(--font-body) !important; }
 
-/* ── AOS — reduce motion override ──────────────────────────── */
+/* ── AOS — safe first paint + reduce motion override ──────── */
+body:not(.aos-ready) [data-aos] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-aos] { transition: none !important; animation: none !important; opacity: 1 !important; transform: none !important; }
 }
