@@ -52,6 +52,11 @@ export default function PublicEnhancements() {
         const next = lang === 'id' ? node.dataset.ariaLabelId : node.dataset.ariaLabelEn
         if (next) node.setAttribute('aria-label', next)
       })
+
+      document.querySelectorAll<HTMLElement>('[data-alt-en]').forEach(node => {
+        const next = lang === 'id' ? node.dataset.altId : node.dataset.altEn
+        if (next) node.setAttribute('alt', next)
+      })
     }
 
     const savedTheme = localStorage.getItem('cotch_theme') || 'light'
@@ -168,6 +173,10 @@ export default function PublicEnhancements() {
       const badge = document.getElementById('weatherBadge')
       if (!badge) return
 
+      const currentLang = document.documentElement.lang === 'id' ? 'id' : 'en'
+      const cityLabel = 'Bandung'
+      const fallbackDayLabel = currentLang === 'id' ? 'Hari ini' : 'Today'
+
       ;(badge as HTMLElement).style.display = 'inline-flex'
 
       try {
@@ -176,33 +185,34 @@ export default function PublicEnhancements() {
         const temp = Math.round(data.current.temperature_2m)
         const code = Number(data.current.weather_code)
         const map = [
-          { max: 0, icon: '☀️', desc: 'Clear' },
-          { max: 1, icon: '🌤️', desc: 'Mostly Clear' },
-          { max: 2, icon: '⛅', desc: 'Partly Cloudy' },
-          { max: 3, icon: '☁️', desc: 'Overcast' },
-          { max: 48, icon: '🌫️', desc: 'Foggy' },
-          { max: 55, icon: '🌦️', desc: 'Drizzle' },
-          { max: 65, icon: '🌧️', desc: 'Rainy' },
-          { max: 75, icon: '🌨️', desc: 'Snowy' },
-          { max: 82, icon: '🌦️', desc: 'Showers' },
-          { max: 99, icon: '⛈️', desc: 'Thunderstorm' },
+          { max: 0, icon: '☀️', descEn: 'Clear', descId: 'Cerah' },
+          { max: 1, icon: '🌤️', descEn: 'Mostly Clear', descId: 'Sebagian Cerah' },
+          { max: 2, icon: '⛅', descEn: 'Partly Cloudy', descId: 'Berawan Sebagian' },
+          { max: 3, icon: '☁️', descEn: 'Overcast', descId: 'Mendung' },
+          { max: 48, icon: '🌫️', descEn: 'Foggy', descId: 'Berkabut' },
+          { max: 55, icon: '🌦️', descEn: 'Drizzle', descId: 'Gerimis' },
+          { max: 65, icon: '🌧️', descEn: 'Rainy', descId: 'Hujan' },
+          { max: 75, icon: '🌨️', descEn: 'Snowy', descId: 'Bersalju' },
+          { max: 82, icon: '🌦️', descEn: 'Showers', descId: 'Hujan Ringan' },
+          { max: 99, icon: '⛈️', descEn: 'Thunderstorm', descId: 'Badai Petir' },
         ]
         const match = map.find(entry => code <= entry.max) || map[map.length - 1]
         const iconEl = document.getElementById('wIcon')
         const tempEl = document.getElementById('wTemp')
         const cityEl = document.getElementById('wCity')
+        const desc = currentLang === 'id' ? match.descId : match.descEn
         if (iconEl) iconEl.textContent = match.icon
         if (tempEl) tempEl.textContent = `${temp}°C`
-        if (cityEl) cityEl.textContent = 'Bandung'
-        badge.setAttribute('title', `${match.desc} · ${temp}°C · Bandung`)
+        if (cityEl) cityEl.textContent = cityLabel
+        badge.setAttribute('title', `${desc} · ${temp}°C · ${cityLabel}`)
       } catch {
         const iconEl = document.getElementById('wIcon')
         const tempEl = document.getElementById('wTemp')
         const cityEl = document.getElementById('wCity')
         if (iconEl) iconEl.textContent = '☕'
-        if (tempEl) tempEl.textContent = 'Bandung'
-        if (cityEl) cityEl.textContent = 'Today'
-        badge.setAttribute('title', 'Bandung')
+        if (tempEl) tempEl.textContent = cityLabel
+        if (cityEl) cityEl.textContent = fallbackDayLabel
+        badge.setAttribute('title', cityLabel)
       }
     }
 

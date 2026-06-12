@@ -78,7 +78,7 @@ export default async function HomePage() {
               >
                 {site.isOpen ? 'Open Now' : 'Closed'}
               </span>
-              <div className="hero__weather" id="weatherBadge" title="Current weather in Bandung">
+              <div className="hero__weather" id="weatherBadge" title="Current weather in Bandung" data-title-en="Current weather in Bandung" data-title-id="Cuaca saat ini di Bandung">
                 <span id="wIcon">🌡️</span>
                 <span id="wTemp">—°C</span>
                 <span id="wCity">Bandung</span>
@@ -143,11 +143,11 @@ export default async function HomePage() {
           <div className="hero__visual" data-aos="fade-up" data-aos-delay="150">
             <div className="hero__img-main" style={{ overflow: 'hidden' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={site.heroImgMain || DEFAULT_SITE.heroImgMain} alt="Cotch Cafe Interior" loading="eager" fetchPriority="high" decoding="sync" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={site.heroImgMain || DEFAULT_SITE.heroImgMain} alt="Cotch Cafe Interior" data-alt-en="Cotch Cafe Interior" data-alt-id="Interior Cafe Cotch" loading="eager" fetchPriority="high" decoding="sync" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div className="hero__img-float" style={{ overflow: 'hidden' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={site.heroImgFloat || DEFAULT_SITE.heroImgFloat} alt="Cotch signature drink" loading="eager" fetchPriority="high" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={site.heroImgFloat || DEFAULT_SITE.heroImgFloat} alt="Cotch signature drink" data-alt-en="Cotch signature drink" data-alt-id="Minuman signature Cotch" loading="eager" fetchPriority="high" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div className="hero__badge">
               <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">

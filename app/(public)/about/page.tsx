@@ -52,11 +52,11 @@ export default async function AboutPage() {
             <div className="about-imgs">
               <div className="about-img-main" style={{ overflow: 'hidden' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={aboutImgMain} alt="Cotch interior" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={aboutImgMain} alt="Cotch interior" data-alt-en="Cotch interior" data-alt-id="Interior Cotch" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div className="about-img-float" style={{ overflow: 'hidden' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={aboutImgSub} alt="Barista at work" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={aboutImgSub} alt="Barista at work" data-alt-en="Barista at work" data-alt-id="Barista sedang bekerja" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             </div>
 
@@ -96,11 +96,11 @@ export default async function AboutPage() {
             <div className="about-imgs">
               <div className="about-img-main" style={{ overflow: 'hidden' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={semiOutdoorMain} alt="Semi-outdoor terrace" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={semiOutdoorMain} alt="Semi-outdoor terrace" data-alt-en="Semi-outdoor terrace" data-alt-id="Teras semi-outdoor" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div className="about-img-float" style={{ overflow: 'hidden', left: 'auto', right: '-32px' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={semiOutdoorSub} alt="Garden area" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={semiOutdoorSub} alt="Garden area" data-alt-en="Garden area" data-alt-id="Area taman" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             </div>
 
@@ -202,6 +202,8 @@ export default async function AboutPage() {
                 style={{ border: 0, display: 'block' }}
                 loading="lazy"
                 title="Cotch Cafe Location — LLRE Martadinata 221, Bandung"
+                data-title-en="Cotch Cafe Location — LLRE Martadinata 221, Bandung"
+                data-title-id="Lokasi Cafe Cotch — LLRE Martadinata 221, Bandung"
               />
               <a href={site.mapsLink} target="_blank" rel="noopener noreferrer" style={{ position: 'absolute', bottom: 14, right: 14, background: '#fff', color: 'var(--red)', fontSize: '.78rem', fontWeight: 700, padding: '8px 14px', borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,.15)', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span data-copy-en="Open in Maps" data-copy-id="Buka di Peta">Open in Maps</span>
@@ -217,8 +219,10 @@ export default async function AboutPage() {
         <div className="container text-center" style={{ padding: '56px 24px' }}>
           <h2 style={{ color: '#fff', marginBottom: 12 }} data-copy-en="Come Visit Us" data-copy-id="Datang dan Kunjungi Kami">Come Visit Us</h2>
           <p style={{ color: 'rgba(255,255,255,.8)', maxWidth: 480, margin: '0 auto 28px', fontSize: '.95rem' }}>
-            {site.locationId}<br />
-            {site.daysText}, {site.openTime} – {site.closeTime} WIB
+            <span>{site.locationId}</span><br />
+            <span data-copy-en={`${site.daysText}, ${site.openTime} – ${site.closeTime} WIB`} data-copy-id={`${site.daysTextId}, ${site.openTime} – ${site.closeTime} WIB`}>
+              {site.daysText}, {site.openTime} – {site.closeTime} WIB
+            </span>
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/booking" className="btn btn--lg" style={{ background: '#fff', color: 'var(--red)', borderColor: '#fff' }}>
