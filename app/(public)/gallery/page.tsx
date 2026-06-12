@@ -2,6 +2,7 @@ import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import GalleryPageClient from '@/components/gallery/GalleryPageClient'
 
 export const metadata = { title: 'Gallery — Cotch' }
+export const dynamic = 'force-dynamic'
 
 export default async function GalleryPage() {
   if (!hasAdminSupabaseEnv()) {

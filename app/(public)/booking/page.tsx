@@ -5,6 +5,7 @@ import BookingClient from '@/components/booking/BookingClient'
 import LookupClient from '@/components/lookup/LookupClient'
 
 export const metadata: Metadata = { title: 'Reserve a Table' }
+export const dynamic = 'force-dynamic'
 
 const getFloorTables = unstable_cache(
   async () => {

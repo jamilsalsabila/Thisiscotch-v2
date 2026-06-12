@@ -98,10 +98,10 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="admin-split-grid">
-        <div className="a-card">
+        <div className="a-card admin-dashboard-card">
           <h2>Recent Bookings</h2>
-          <div className="a-table-wrap">
-            <table>
+          <div className="a-table-wrap admin-dashboard-table-wrap">
+            <table className="admin-dashboard-table">
               <thead><tr><th>Code</th><th>Guest</th><th>Date</th><th>Status</th></tr></thead>
               <tbody>
                 {recentBookings?.map((booking: any) => (
@@ -119,10 +119,10 @@ export default async function AdminDashboard() {
           <div style={{ marginTop: 12 }}><Link href="/admin/bookings" className="a-btn a-btn--outline a-btn--sm">View All →</Link></div>
         </div>
 
-        <div className="a-card">
+        <div className="a-card admin-dashboard-card">
           <h2>Recent Orders</h2>
-          <div className="a-table-wrap">
-            <table>
+          <div className="a-table-wrap admin-dashboard-table-wrap">
+            <table className="admin-dashboard-table">
               <thead><tr><th>Code</th><th>Guest</th><th>Total</th><th>Status</th></tr></thead>
               <tbody>
                 {recentOrders?.map((order: any) => (

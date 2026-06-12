@@ -251,14 +251,17 @@ export async function saveSiteSettings(settings: Record<string, string>) {
     value,
     updated_at: new Date().toISOString(),
   }))
-  await (supabase.from('site_settings') as any).upsert(rows)
+  await (supabase.from('site_settings') as any).upsert(rows, { onConflict: 'key' })
   revalidatePath('/admin/settings')
   revalidatePath('/admin/schedule')
   revalidatePath('/admin/categories')
   revalidatePath('/')
   revalidatePath('/about')
+  revalidatePath('/booking')
+  revalidatePath('/gallery')
   revalidatePath('/menu')
   revalidatePath('/order')
+  revalidatePath('/reviews')
 }
 
 export async function saveSiteSettingsForm(formData: FormData) {

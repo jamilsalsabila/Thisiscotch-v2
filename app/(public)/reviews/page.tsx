@@ -4,6 +4,7 @@ import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import ReviewsClient from '@/components/reviews/ReviewsClient'
 
 export const metadata: Metadata = { title: 'Customer Reviews' }
+export const dynamic = 'force-dynamic'
 
 const getPublishedReviews = unstable_cache(
   async () => {

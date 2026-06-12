@@ -10,6 +10,7 @@ import type { Database } from '@/types/database'
 type MenuItem = Database['public']['Tables']['menu_items']['Row']
 
 export const metadata: Metadata = { title: 'Our Menu' }
+export const dynamic = 'force-dynamic'
 
 const getMenuItems = unstable_cache(
   async (): Promise<MenuItem[]> => {

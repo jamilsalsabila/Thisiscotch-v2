@@ -512,7 +512,33 @@ tbody tr:hover { background: rgba(0,0,0,.02); }
 .admin-schedule-status-row {
   max-width: 100%;
 }
-.admin-split-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.admin-split-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; }
+.admin-split-grid > .a-card,
+.admin-dashboard-card {
+  min-width: 0;
+}
+.admin-dashboard-table-wrap {
+  max-width: 100%;
+}
+.admin-dashboard-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+.admin-dashboard-table th,
+.admin-dashboard-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-dashboard-table code {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
 .day-schedule-table { width:100%; border-collapse:collapse; }
 .day-schedule-table th {
   text-align:left; font-size:.75rem; font-weight:600; color:var(--a-muted);

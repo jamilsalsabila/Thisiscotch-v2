@@ -725,18 +725,27 @@ em, h1 em, h2 em { font-style: italic; font-weight: 500; }
 }
 
 /* ── Location section ──────────────────────────── */
-.location-content .section-label { margin-bottom: 12px; }
+.location-content {
+  text-align: center;
+}
+.location-content .section-label {
+  margin-bottom: 12px;
+  justify-content: center;
+}
+.location-content .section-title {
+  text-align: center;
+}
 .location-info {
-  display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px;
+  display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; align-items: center;
 }
 .location-info__row {
-  display: flex; gap: 12px; align-items: flex-start;
+  display: flex; gap: 12px; align-items: flex-start; justify-content: flex-start; width: min(100%, 420px); text-align: left;
 }
 .location-info__icon { flex-shrink: 0; margin-top: 2px; display: inline-flex; align-items: center; }
 .location-info__name { font-weight: 600; font-size: .9rem; margin-bottom: 2px; }
 .location-info__sub  { color: var(--muted); font-size: .82rem; }
 .location-info__hours { font-size: .9rem; margin-top: 1px; }
-.location-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.location-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .date-row       { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .rev-summary {
   display: flex;

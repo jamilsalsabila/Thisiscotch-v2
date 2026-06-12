@@ -7,6 +7,7 @@ import OrderClient from '@/components/order/OrderClient'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 
 export const metadata: Metadata = { title: 'Order Online' }
+export const dynamic = 'force-dynamic'
 
 const getMenuItems = unstable_cache(
   async (): Promise<MenuItem[]> => {

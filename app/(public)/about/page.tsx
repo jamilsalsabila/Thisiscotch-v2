@@ -6,6 +6,7 @@ import { getSiteData } from '@/lib/site'
 import type { Database } from '@/types/database'
 
 export const metadata = { title: 'About Us — Cotch' }
+export const dynamic = 'force-dynamic'
 
 const getAboutGallery = unstable_cache(
   async (): Promise<Database['public']['Tables']['gallery_items']['Row'][]> => {

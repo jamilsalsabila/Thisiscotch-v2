@@ -10,6 +10,9 @@ import {
   MapPinIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline'
+
+export const dynamic = 'force-dynamic'
+
 const getHomeData = unstable_cache(
   async (): Promise<{
     menuItems: Database['public']['Tables']['menu_items']['Row'][]
