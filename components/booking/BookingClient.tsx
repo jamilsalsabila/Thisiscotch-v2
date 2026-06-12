@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createBooking, getBookedTableIds } from '@/app/(public)/booking/actions'
 import { cancelRecord } from '@/app/(public)/lookup/actions'
 import { formatDateDisplay } from '@/utils/format'
@@ -20,10 +20,10 @@ const BG_IMG: Record<Section, string> = {
 }
 
 // Display labels match old PHP sectionLabels (sections are "swapped" vs display)
-const SECTION_LABELS: Record<Section, string> = {
-  'indoor':         'Indoor',
-  'semi-outdoor-1': 'Semi-Outdoor 2',
-  'semi-outdoor-2': 'Semi-Outdoor 1',
+const SECTION_LABELS: Record<Section, { en: string; id: string }> = {
+  'indoor':         { en: 'Indoor', id: 'Indoor' },
+  'semi-outdoor-1': { en: 'Semi-Outdoor 2', id: 'Semi-Outdoor 2' },
+  'semi-outdoor-2': { en: 'Semi-Outdoor 1', id: 'Semi-Outdoor 1' },
 }
 
 // Tab order: Indoor → Semi-Outdoor 1 → Semi-Outdoor 2
@@ -111,6 +111,7 @@ type BookingResult = { bookingCode: string; tableId: string; tableLabel: string;
 interface Props { tables: FloorTable[] }
 
 export default function BookingClient({ tables }: Props) {
+  const [lang, setLang] = useState<'en' | 'id'>('en')
   const [activeSection, setSection]     = useState<Section>('indoor')
   const [selectedDate, setDate]         = useState(TODAY)
   const [selectedTime, setTime]         = useState('12:00')
@@ -122,6 +123,24 @@ export default function BookingClient({ tables }: Props) {
   const [cancelingResult, setCancelingResult] = useState(false)
   const [error, setError]               = useState('')
   const [form, setForm] = useState({ name: '', phone: '', email: '', partySize: '2', specialRequest: '' })
+
+  useEffect(() => {
+    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
+
+    applyLang(localStorage.getItem('cotch_lang') || 'en')
+
+    const onLangChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
+      if (typeof detail === 'string') {
+        applyLang(detail)
+        return
+      }
+      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
+    }
+
+    document.addEventListener('langChanged', onLangChanged)
+    return () => document.removeEventListener('langChanged', onLangChanged)
+  }, [])
 
   const fetchAvailability = useCallback(async (date: string, time: string) => {
     setLoadingAvail(true)
@@ -153,7 +172,10 @@ export default function BookingClient({ tables }: Props) {
     })
 
     setSubmitting(false)
-    if (!res.success) { setError(res.error ?? 'Terjadi kesalahan.'); return }
+    if (!res.success) {
+      setError(res.error ?? (lang === 'id' ? 'Terjadi kesalahan.' : 'Something went wrong.'))
+      return
+    }
 
     const def = ALL_TABLES[activeSection].find(d => d.id === selectedTableId)
     setResult({
@@ -180,7 +202,7 @@ export default function BookingClient({ tables }: Props) {
     const res = await cancelRecord('booking', result.bookingCode)
     setCancelingResult(false)
     if (!res.success) {
-      setError(res.error ?? 'Booking tidak bisa dibatalkan.')
+      setError(res.error ?? (lang === 'id' ? 'Booking tidak bisa dibatalkan.' : 'Booking cannot be cancelled.'))
       return
     }
     resetForm()
@@ -230,7 +252,7 @@ export default function BookingClient({ tables }: Props) {
         {SECTION_TABS.map(s => (
           <button key={s} className={`tab-btn${activeSection === s ? ' active' : ''}`}
             onClick={() => { setSection(s); setTableId(null) }}>
-            {SECTION_LABELS[s]}
+            {SECTION_LABELS[s][lang]}
           </button>
         ))}
       </div>
@@ -279,13 +301,13 @@ export default function BookingClient({ tables }: Props) {
           {/* Legend */}
           <div className="floor-legend">
             {[
-              { color: '#d4edda', border: '#22863a', label: 'Available' },
-              { color: '#f8d7da', border: '#c0392b', label: 'Booked' },
-              { color: '#fde68a', border: '#d4941a', label: 'Selected' },
-            ].map(({ color, border, label }) => (
-              <div key={label} className="floor-legend__item">
+              { color: '#d4edda', border: '#22863a', labelEn: 'Available', labelId: 'Tersedia' },
+              { color: '#f8d7da', border: '#c0392b', labelEn: 'Booked', labelId: 'Sudah Dipesan' },
+              { color: '#fde68a', border: '#d4941a', labelEn: 'Selected', labelId: 'Terpilih' },
+            ].map(({ color, border, labelEn, labelId }) => (
+              <div key={labelEn} className="floor-legend__item">
                 <div className="floor-legend__dot" style={{ background: color, border: `1.5px solid ${border}` }} />
-                {label}
+                {lang === 'id' ? labelId : labelEn}
               </div>
             ))}
           </div>
@@ -294,7 +316,7 @@ export default function BookingClient({ tables }: Props) {
             {selectedTableId && selectedDef
               ? (
                 <>
-                  <span data-copy-en="Selected table:" data-copy-id="Meja terpilih:">Selected table:</span> <strong>{SECTION_LABELS[activeSection]} — {getDisplayLabel(selectedDef)}</strong>
+                  <span data-copy-en="Selected table:" data-copy-id="Meja terpilih:">Selected table:</span> <strong>{SECTION_LABELS[activeSection][lang]} — {getDisplayLabel(selectedDef)}</strong>
                   {' · '}{selectedDef.cap} pax{' · '}{formatDateDisplay(selectedDate)} · {selectedTime}
                 </>
               )
@@ -327,15 +349,15 @@ export default function BookingClient({ tables }: Props) {
               <label className="form-label" data-copy-en="Email (optional)" data-copy-id="Email (opsional)">Email (optional)</label>
               <input className="form-input" type="email" value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                placeholder="your@email.com" />
+                placeholder="your@email.com" data-placeholder-en="your@email.com" data-placeholder-id="email@anda.com" />
             </div>
             <div className="form-group">
               <label className="form-label" data-copy-en="Party Size" data-copy-id="Jumlah Tamu">Party Size</label>
               <select className="form-select" value={form.partySize}
                 onChange={e => setForm(f => ({ ...f, partySize: e.target.value }))}>
-                {Array.from({ length: selectedDef?.cap ?? 6 }, (_, i) => i + 1).map(n => (
-                  <option key={n} value={n}>{n} pax</option>
-                ))}
+                  {Array.from({ length: selectedDef?.cap ?? 6 }, (_, i) => i + 1).map(n => (
+                    <option key={n} value={n}>{n} pax</option>
+                  ))}
               </select>
               <p className="form-hint" data-copy-en="Max capacity depends on selected table." data-copy-id="Kapasitas maksimal tergantung meja yang dipilih.">Max capacity depends on selected table.</p>
             </div>
@@ -376,12 +398,12 @@ export default function BookingClient({ tables }: Props) {
               </div>
               <div className="ticket__body">
                 {[
-                  { k: 'Guest', v: result.name },
-                  { k: 'Table', v: result.tableLabel },
-                  { k: 'Section', v: SECTION_LABELS[result.section] },
-                  { k: 'Party', v: `${result.partySize} pax` },
-                  { k: 'Date', v: formatDateDisplay(result.date) },
-                  { k: 'Time', v: result.time },
+                  { k: lang === 'id' ? 'Tamu' : 'Guest', v: result.name },
+                  { k: lang === 'id' ? 'Meja' : 'Table', v: result.tableLabel },
+                  { k: lang === 'id' ? 'Area' : 'Section', v: SECTION_LABELS[result.section][lang] },
+                  { k: lang === 'id' ? 'Jumlah Tamu' : 'Party', v: `${result.partySize} pax` },
+                  { k: lang === 'id' ? 'Tanggal' : 'Date', v: formatDateDisplay(result.date) },
+                  { k: lang === 'id' ? 'Waktu' : 'Time', v: result.time },
                 ].map(({ k, v }) => (
                   <div key={k} className="ticket__row">
                     <span className="ticket__key">{k}</span>
