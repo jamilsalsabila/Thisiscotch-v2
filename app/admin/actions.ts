@@ -3,6 +3,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { requireAdminAccess } from '@/lib/admin-auth'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import type { Database } from '@/types/database'
 import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -251,7 +252,10 @@ export async function saveSiteSettings(settings: Record<string, string>) {
     value,
     updated_at: new Date().toISOString(),
   }))
-  await (supabase.from('site_settings') as any).upsert(rows, { onConflict: 'key' })
+  const { error } = await (supabase.from('site_settings') as any).upsert(rows, { onConflict: 'key' })
+  if (error) {
+    throw new Error(`Failed to save site settings: ${error.message}`)
+  }
   revalidatePath('/admin/settings')
   revalidatePath('/admin/schedule')
   revalidatePath('/admin/categories')
@@ -262,6 +266,27 @@ export async function saveSiteSettings(settings: Record<string, string>) {
   revalidatePath('/menu')
   revalidatePath('/order')
   revalidatePath('/reviews')
+}
+
+export async function saveSchedule(formData: FormData) {
+  await requireAdminAccess()
+
+  const nextSchedule: Record<string, { is_open: boolean; open: string; close: string }> = {}
+  for (let day = 1; day <= 7; day += 1) {
+    nextSchedule[String(day)] = {
+      is_open: String(formData.get(`day_open_${day}`) ?? '') === 'on',
+      open: String(formData.get(`open_${day}`) ?? '12:00'),
+      close: String(formData.get(`close_${day}`) ?? '21:00'),
+    }
+  }
+
+  await saveSiteSettings({
+    daily_schedule: JSON.stringify(nextSchedule),
+    days_text: String(formData.get('days_text') ?? 'Mon – Sun'),
+    days_text_id: String(formData.get('days_text_id') ?? 'Sen – Min'),
+  })
+
+  redirect('/admin/schedule?saved=1')
 }
 
 export async function saveSiteSettingsForm(formData: FormData) {

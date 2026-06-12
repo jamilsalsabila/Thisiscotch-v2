@@ -1,6 +1,6 @@
 import { requireAdminAccess } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/server'
-import { saveSiteSettings } from '@/app/admin/actions'
+import { saveSchedule } from '@/app/admin/actions'
 import { getSiteData } from '@/lib/site'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 
@@ -13,10 +13,16 @@ function parseSchedule(value: string | undefined) {
   }
 }
 
-export default async function AdminSchedulePage() {
+export default async function AdminSchedulePage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
+}) {
   await requireAdminAccess()
   const supabase = createAdminClient()
   const site = await getSiteData()
+  const params = await searchParams
+  const isSaved = params?.saved === '1'
   const { data } = await (supabase.from('site_settings').select('key, value').in('key', ['daily_schedule', 'days_text', 'days_text_id']) as any)
   const map = new Map((((data as Array<{ key: string; value: string }> | null) ?? []).map(item => [item.key, item.value])))
   const rawSchedule = map.get('daily_schedule')
@@ -43,22 +49,12 @@ export default async function AdminSchedulePage() {
   ]
 
   return (
-    <form action={async (fd: FormData) => {
-      'use server'
-      const nextSchedule: Record<string, { is_open: boolean; open: string; close: string }> = {}
-      for (const day of days) {
-        nextSchedule[String(day.id)] = {
-          is_open: fd.get(`day_open_${day.id}`) === 'on',
-          open: String(fd.get(`open_${day.id}`) ?? '12:00'),
-          close: String(fd.get(`close_${day.id}`) ?? '21:00'),
-        }
-      }
-      await saveSiteSettings({
-        daily_schedule: JSON.stringify(nextSchedule),
-        days_text: String(fd.get('days_text') ?? 'Mon – Sun'),
-        days_text_id: String(fd.get('days_text_id') ?? 'Sen – Min'),
-      })
-    }}>
+    <form action={saveSchedule}>
+      {isSaved ? (
+        <div className="a-card" style={{ background: '#f0fdf4', borderColor: '#86efac', color: '#166534' }}>
+          <strong>Schedule updated.</strong> The latest opening-hours settings are now saved.
+        </div>
+      ) : null}
       <div className="a-card">
         <h2>Per-Day Hours</h2>
         <p style={{ fontSize: '.85rem', color: 'var(--a-muted)', marginBottom: 20 }}>
