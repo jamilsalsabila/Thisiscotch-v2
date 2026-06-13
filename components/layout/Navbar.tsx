@@ -68,10 +68,13 @@ export default function Navbar() {
   }
 
   function toggleLang(l: 'EN' | 'ID') {
+    if (lang === l) return
+
     setLang(l)
     const lower = l.toLowerCase() as 'en' | 'id'
+    document.documentElement.lang = lower
     localStorage.setItem('cotch_lang', lower)
-    // storage event doesn't fire for same-tab changes, use custom event
+    document.dispatchEvent(new CustomEvent('langChanged', { detail: { lang: lower } }))
     window.dispatchEvent(new CustomEvent('cotch:lang', { detail: lower }))
   }
 
