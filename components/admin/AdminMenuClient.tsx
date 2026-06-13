@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { startTransition, useMemo, useState } from 'react'
 import { deleteMenuItem, deleteMenuItems, toggleMenuAvailable, toggleMenuFeatured } from '@/app/admin/actions'
 import { formatRupiah } from '@/utils/format'
 import MenuForm from '@/components/admin/MenuForm'
@@ -24,6 +24,9 @@ export default function AdminMenuClient({
   const [tab, setTab] = useState('all')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<number[]>([])
+  const [optimisticAvailability, setOptimisticAvailability] = useState<Record<number, boolean>>({})
+  const [optimisticFeatured, setOptimisticFeatured] = useState<Record<number, boolean>>({})
+  const [pendingToggle, setPendingToggle] = useState<Record<string, boolean>>({})
 
   const grouped = useMemo(() => categories.map(category => ({
     category,
@@ -55,6 +58,58 @@ export default function AdminMenuClient({
     setSelected(current => {
       if (allSelected) return current.filter(id => !allVisibleIds.includes(id))
       return [...new Set([...current, ...allVisibleIds])]
+    })
+  }
+
+  function isPending(key: string) {
+    return pendingToggle[key] === true
+  }
+
+  function getAvailable(item: MenuItem) {
+    return optimisticAvailability[item.id] ?? item.is_available
+  }
+
+  function getFeatured(item: MenuItem) {
+    return optimisticFeatured[item.id] ?? item.is_featured
+  }
+
+  function handleToggleAvailable(item: MenuItem, nextValue: boolean) {
+    const key = `available:${item.id}`
+    setOptimisticAvailability(current => ({ ...current, [item.id]: nextValue }))
+    setPendingToggle(current => ({ ...current, [key]: true }))
+
+    startTransition(() => {
+      void toggleMenuAvailable(item.id, nextValue)
+        .catch(() => {
+          setOptimisticAvailability(current => ({ ...current, [item.id]: item.is_available }))
+        })
+        .finally(() => {
+          setPendingToggle(current => {
+            const next = { ...current }
+            delete next[key]
+            return next
+          })
+        })
+    })
+  }
+
+  function handleToggleFeatured(item: MenuItem, nextValue: boolean) {
+    const key = `featured:${item.id}`
+    setOptimisticFeatured(current => ({ ...current, [item.id]: nextValue }))
+    setPendingToggle(current => ({ ...current, [key]: true }))
+
+    startTransition(() => {
+      void toggleMenuFeatured(item.id, nextValue)
+        .catch(() => {
+          setOptimisticFeatured(current => ({ ...current, [item.id]: item.is_featured }))
+        })
+        .finally(() => {
+          setPendingToggle(current => {
+            const next = { ...current }
+            delete next[key]
+            return next
+          })
+        })
     })
   }
 
@@ -109,7 +164,13 @@ export default function AdminMenuClient({
             {labels[group.category] ?? group.category}
             <span className="a-badge a-badge--gray" style={{ fontSize: '.62rem' }}>{group.items.length}</span>
           </div>
-          {group.items.map(item => (
+          {group.items.map(item => {
+            const available = getAvailable(item)
+            const featured = getFeatured(item)
+            const availablePending = isPending(`available:${item.id}`)
+            const featuredPending = isPending(`featured:${item.id}`)
+
+            return (
             <div
               key={item.id}
               className="admin-menu-row"
@@ -122,7 +183,7 @@ export default function AdminMenuClient({
                 borderRadius: 10,
                 padding: '10px 12px',
                 marginBottom: 6,
-                opacity: item.is_available ? 1 : .72,
+                opacity: available ? 1 : .72,
                 boxShadow: selected.includes(item.id) ? '0 0 0 1px var(--a-red) inset' : undefined,
                 flexWrap: 'wrap',
               }}
@@ -141,27 +202,33 @@ export default function AdminMenuClient({
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                   <span className="a-badge a-badge--gray">{item.subcategory}</span>
                   <span style={{ fontWeight: 700, fontSize: '.8rem', color: '#92400e' }}>{formatRupiah(item.price)}</span>
-                  {!item.is_available ? <span className="a-badge a-badge--red" style={{ fontSize: '.6rem' }}>Unavailable</span> : null}
-                  {item.is_featured ? <span className="a-badge a-badge--gold" style={{ fontSize: '.6rem' }}>Featured</span> : null}
+                  {!available ? <span className="a-badge a-badge--red" style={{ fontSize: '.6rem' }}>Unavailable</span> : null}
+                  {featured ? <span className="a-badge a-badge--gold" style={{ fontSize: '.6rem' }}>Featured</span> : null}
                 </div>
               </div>
               <div className="admin-menu-toggles" style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                  <form action={async () => { await toggleMenuAvailable(item.id, !item.is_available) }}>
-                    <label className="a-toggle">
-                      <input type="checkbox" checked={item.is_available} onChange={event => event.currentTarget.form?.requestSubmit()} />
-                      <span className="a-toggle__slider" />
-                    </label>
-                  </form>
+                  <label className="a-toggle" style={{ opacity: availablePending ? .7 : 1 }}>
+                    <input
+                      type="checkbox"
+                      checked={available}
+                      disabled={availablePending}
+                      onChange={event => handleToggleAvailable(item, event.target.checked)}
+                    />
+                    <span className="a-toggle__slider" />
+                  </label>
                   <span style={{ fontSize: '.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--a-muted)' }}>Available</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                  <form action={async () => { await toggleMenuFeatured(item.id, !item.is_featured) }}>
-                    <label className="a-toggle">
-                      <input type="checkbox" checked={item.is_featured} onChange={event => event.currentTarget.form?.requestSubmit()} />
-                      <span className="a-toggle__slider" />
-                    </label>
-                  </form>
+                  <label className="a-toggle" style={{ opacity: featuredPending ? .7 : 1 }}>
+                    <input
+                      type="checkbox"
+                      checked={featured}
+                      disabled={featuredPending}
+                      onChange={event => handleToggleFeatured(item, event.target.checked)}
+                    />
+                    <span className="a-toggle__slider" />
+                  </label>
                   <span style={{ fontSize: '.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--a-muted)' }}>Featured</span>
                 </div>
               </div>
@@ -172,7 +239,7 @@ export default function AdminMenuClient({
                 </form>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       ))}
 
