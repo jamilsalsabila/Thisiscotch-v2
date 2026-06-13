@@ -39,7 +39,7 @@ const getHomeData = unstable_cache(
       { data: reviews },
       { count: totalTables },
     ] = await Promise.all([
-      (supabase.from('menu_items').select('*', { count: 'exact' }).eq('is_featured', true).eq('is_available', true).order('sort_order').limit(6) as any),
+      (supabase.from('menu_items').select('*', { count: 'exact' }).eq('is_featured', true).eq('is_available', true).order('sort_order') as any),
       (supabase.from('gallery_items').select('*').eq('is_active', true).order('sort_order').limit(8) as any),
       (supabase.from('reviews').select('*').eq('is_published', true).order('created_at', { ascending: false }).limit(3) as any),
       (supabase.from('floor_tables').select('*', { count: 'exact', head: true }).eq('is_active', true) as any),
