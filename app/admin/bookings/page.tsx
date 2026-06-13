@@ -4,6 +4,7 @@ import { requireAdminAccess } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/server'
 import { updateBookingStatus, updateOrderStatus, updateWaitlistStatus } from '@/app/admin/actions'
 import AdminActionForm from '@/components/admin/AdminActionForm'
+import AdminOrderStatusForm from '@/components/admin/AdminOrderStatusForm'
 import { formatRupiah, tableLabel } from '@/utils/format'
 
 type SearchParams = Promise<{ tab?: string; q?: string; msg?: string }>
@@ -168,23 +169,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                     <td>
                       <div className="admin-order-actions">
                         {!isCancelledOrder && (
-                          <form className="admin-order-status-form" action={async (formData: FormData) => {
-                            'use server'
-                            await updateOrderStatus(order.id, String(formData.get('status') ?? 'pending'))
-                            redirect(bookingsPageUrl('orders', 'Status order diperbarui.'))
-                          }}>
-                            <select
-                              name="status"
-                              className="a-select"
-                              style={{ padding: '4px 8px', fontSize: '.75rem' }}
-                              defaultValue={order.status}
-                              onChange={e => e.currentTarget.form?.requestSubmit()}
-                            >
-                              {['pending', 'confirmed', 'preparing', 'ready', 'cancelled'].map(status => (
-                                <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                              ))}
-                            </select>
-                          </form>
+                          <AdminOrderStatusForm orderId={order.id} defaultValue={String(order.status ?? 'pending')} />
                         )}
                       </div>
                     </td>
