@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { requireAdminAccess } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/server'
 import { formatRupiah } from '@/utils/format'
+import LegacyIcon from '@/components/ui/LegacyIcon'
 
 export default async function AdminDashboard() {
   await requireAdminAccess()
@@ -34,11 +35,11 @@ export default async function AdminDashboard() {
     : null
 
   const quickLinks = [
-    ['Menu', '/admin/menu', '🍽️'],
-    ['Schedule', '/admin/schedule', '🕐'],
-    ['Gallery', '/admin/gallery', '🖼️'],
-    ['Settings', '/admin/settings', '⚙️'],
-    ['Bookings', '/admin/bookings', '📋'],
+    ['Menu', '/admin/menu', 'squares-2x2'],
+    ['Schedule', '/admin/schedule', 'clock'],
+    ['Gallery', '/admin/gallery', 'photo'],
+    ['Settings', '/admin/settings', 'cog'],
+    ['Bookings', '/admin/bookings', 'clipboard-list'],
   ] as const
 
   return (
@@ -74,7 +75,9 @@ export default async function AdminDashboard() {
       <div className="admin-quick-links" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
         {quickLinks.map(([label, href, icon]) => (
           <Link key={href} href={href} className="a-card admin-quick-link" style={{ display: 'flex', alignItems: 'center', gap: 12, margin: 0, textDecoration: 'none', transition: '.15s' }}>
-            <span style={{ fontSize: '1.5rem', lineHeight: 1, flexShrink: 0 }}>{icon}</span>
+            <span style={{ width: 32, height: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--a-red)' }}>
+              <LegacyIcon name={icon} size={20} />
+            </span>
             <span style={{ fontWeight: 600, color: 'var(--a-text)' }}>{label}</span>
           </Link>
         ))}
