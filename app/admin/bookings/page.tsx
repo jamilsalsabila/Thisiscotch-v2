@@ -103,7 +103,11 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 <tr><th>Code</th><th>Guest</th><th>Phone</th><th>Table</th><th>Date</th><th>Time</th><th>Party</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
-                {bookingRows.map(booking => (
+                {bookingRows.map(booking => {
+                  const bookingStatus = String(booking.status ?? '').toLowerCase()
+                  const canCancelBooking = !['cancelled', 'completed', 'done'].includes(bookingStatus)
+
+                  return (
                   <tr key={booking.id}>
                     <td><code style={{ fontSize: '.72rem' }}>{booking.booking_code}</code></td>
                     <td>{booking.guest_name}</td>
@@ -115,23 +119,25 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                     <td>{booking.booking_date}</td>
                     <td>{booking.booking_time}</td>
                     <td>{booking.party_size} pax</td>
-                    <td><span className={`a-badge ${booking.status === 'active' ? 'a-badge--green' : 'a-badge--red'}`}>{booking.status}</span></td>
-                    <td className="admin-booking-actions" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {booking.status === 'active' && (
-                        <AdminActionForm
-                          action={async () => {
-                            'use server'
-                            await updateBookingStatus(booking.id, 'cancelled')
-                            redirect(bookingsPageUrl('bookings', 'Booking dibatalkan.', q))
-                          }}
-                          confirmMessage="Batalkan booking ini?"
-                        >
-                          <button type="submit" className="a-btn a-btn--danger a-btn--xs">Cancel</button>
-                        </AdminActionForm>
-                      )}
+                    <td><span className={`a-badge ${bookingStatus === 'active' ? 'a-badge--green' : 'a-badge--red'}`}>{booking.status}</span></td>
+                    <td>
+                      <div className="admin-booking-actions">
+                        {canCancelBooking && (
+                          <AdminActionForm
+                            action={async () => {
+                              'use server'
+                              await updateBookingStatus(booking.id, 'cancelled')
+                              redirect(bookingsPageUrl('bookings', 'Booking dibatalkan.', q))
+                            }}
+                            confirmMessage="Batalkan booking ini?"
+                          >
+                            <button type="submit" className="a-btn a-btn--danger a-btn--xs">Cancel</button>
+                          </AdminActionForm>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ))}
+                )})}
                 {bookingRows.length === 0 && <tr><td colSpan={9} style={{ textAlign: 'center', color: 'var(--a-muted)', padding: 24 }}>No bookings yet</td></tr>}
               </tbody>
             </table>
@@ -147,37 +153,43 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 <tr><th>Code</th><th>Guest</th><th>Phone</th><th>Table</th><th>Total</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
-                {orderRows.map(order => (
+                {orderRows.map(order => {
+                  const orderStatus = String(order.status ?? '').toLowerCase()
+                  const isCancelledOrder = orderStatus === 'cancelled'
+
+                  return (
                   <tr key={order.id}>
                     <td><code style={{ fontSize: '.72rem' }}>{order.order_code}</code></td>
                     <td>{order.guest_name}</td>
                     <td style={{ fontSize: '.8rem' }}>{order.guest_phone}</td>
                     <td>{order.table_number || '—'}</td>
                     <td>{formatRupiah(Number(order.total_amount))}</td>
-                    <td><span className={`a-badge ${order.status === 'cancelled' ? 'a-badge--red' : order.status === 'ready' ? 'a-badge--green' : order.status === 'confirmed' || order.status === 'preparing' ? 'a-badge--gold' : 'a-badge--gray'}`}>{order.status}</span></td>
+                    <td><span className={`a-badge ${orderStatus === 'cancelled' ? 'a-badge--red' : orderStatus === 'ready' ? 'a-badge--green' : orderStatus === 'confirmed' || orderStatus === 'preparing' ? 'a-badge--gold' : 'a-badge--gray'}`}>{order.status}</span></td>
                     <td>
-                      {order.status !== 'cancelled' && (
-                        <form className="admin-order-status-form" action={async (formData: FormData) => {
-                          'use server'
-                          await updateOrderStatus(order.id, String(formData.get('status') ?? 'pending'))
-                          redirect(bookingsPageUrl('orders', 'Status order diperbarui.'))
-                        }}>
-                          <select
-                            name="status"
-                            className="a-select"
-                            style={{ padding: '4px 8px', fontSize: '.75rem' }}
-                            defaultValue={order.status}
-                            onChange={e => e.currentTarget.form?.requestSubmit()}
-                          >
-                            {['pending', 'confirmed', 'preparing', 'ready', 'cancelled'].map(status => (
-                              <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-                            ))}
-                          </select>
-                        </form>
-                      )}
+                      <div className="admin-order-actions">
+                        {!isCancelledOrder && (
+                          <form className="admin-order-status-form" action={async (formData: FormData) => {
+                            'use server'
+                            await updateOrderStatus(order.id, String(formData.get('status') ?? 'pending'))
+                            redirect(bookingsPageUrl('orders', 'Status order diperbarui.'))
+                          }}>
+                            <select
+                              name="status"
+                              className="a-select"
+                              style={{ padding: '4px 8px', fontSize: '.75rem' }}
+                              defaultValue={order.status}
+                              onChange={e => e.currentTarget.form?.requestSubmit()}
+                            >
+                              {['pending', 'confirmed', 'preparing', 'ready', 'cancelled'].map(status => (
+                                <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+                              ))}
+                            </select>
+                          </form>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ))}
+                )})}
                 {orderRows.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--a-muted)', padding: 24 }}>No orders yet</td></tr>}
               </tbody>
             </table>
@@ -193,7 +205,11 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 <tr><th>Code</th><th>Guest</th><th>Phone</th><th>Pref. Date</th><th>Pref. Time</th><th>Party</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
-                {waitlistRows.map(item => (
+                {waitlistRows.map(item => {
+                  const waitlistStatus = String(item.status ?? '').toLowerCase()
+                  const canCancelWaitlist = !['cancelled', 'completed', 'seated'].includes(waitlistStatus)
+
+                  return (
                   <tr key={item.id}>
                     <td><code style={{ fontSize: '.72rem' }}>{item.waitlist_code}</code></td>
                     <td>{item.guest_name}</td>
@@ -201,23 +217,25 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                     <td>{item.preferred_date}</td>
                     <td>{item.preferred_time}</td>
                     <td>{item.party_size} pax</td>
-                    <td><span className={`a-badge ${item.status === 'waiting' ? 'a-badge--gold' : item.status === 'notified' ? 'a-badge--green' : 'a-badge--red'}`}>{item.status}</span></td>
+                    <td><span className={`a-badge ${waitlistStatus === 'waiting' ? 'a-badge--gold' : waitlistStatus === 'notified' ? 'a-badge--green' : 'a-badge--red'}`}>{item.status}</span></td>
                     <td>
-                      {item.status === 'waiting' && (
-                        <AdminActionForm
-                          action={async () => {
-                            'use server'
-                            await updateWaitlistStatus(item.id, 'cancelled')
-                            redirect(bookingsPageUrl('waitlist', 'Waitlist dibatalkan.', q))
-                          }}
-                          confirmMessage="Batalkan waitlist ini?"
-                        >
-                          <button type="submit" className="a-btn a-btn--danger a-btn--xs">Cancel</button>
-                        </AdminActionForm>
-                      )}
+                      <div className="admin-booking-actions">
+                        {canCancelWaitlist && (
+                          <AdminActionForm
+                            action={async () => {
+                              'use server'
+                              await updateWaitlistStatus(item.id, 'cancelled')
+                              redirect(bookingsPageUrl('waitlist', 'Waitlist dibatalkan.', q))
+                            }}
+                            confirmMessage="Batalkan waitlist ini?"
+                          >
+                            <button type="submit" className="a-btn a-btn--danger a-btn--xs">Cancel</button>
+                          </AdminActionForm>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ))}
+                )})}
                 {waitlistRows.length === 0 && <tr><td colSpan={8} style={{ textAlign: 'center', color: 'var(--a-muted)', padding: 24 }}>No waitlist entries yet</td></tr>}
               </tbody>
             </table>

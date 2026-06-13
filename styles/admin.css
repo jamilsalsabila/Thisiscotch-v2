@@ -497,8 +497,30 @@ tbody tr:hover { background: rgba(0,0,0,.02); }
   border-radius:6px; font-size:.875rem; width:100%; background:#fff; outline:none;
 }
 .admin-inline-search:focus { border-color: var(--a-red); box-shadow: 0 0 0 3px rgba(196,18,48,.08); }
-.admin-booking-actions { min-width: 120px; }
-.admin-order-status-form { min-width: 140px; }
+.admin-booking-actions,
+.admin-order-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-height: 28px;
+  min-width: 96px;
+}
+.admin-booking-actions form,
+.admin-order-actions form {
+  margin: 0;
+}
+.admin-booking-actions .a-btn {
+  min-width: 78px;
+  justify-content: center;
+}
+.admin-order-status-form {
+  min-width: 140px;
+  max-width: 160px;
+}
+.admin-order-status-form .a-select {
+  width: 100%;
+}
 .admin-review-meta code { white-space: nowrap; }
 .admin-review-reply-details { width: auto; }
 .admin-quick-link:hover {
@@ -560,9 +582,19 @@ tbody tr:hover { background: rgba(0,0,0,.02); }
 
 @media (max-width: 900px) {
   .admin-split-grid { grid-template-columns: 1fr; }
-  .admin-booking-actions { min-width: 132px; }
+  .admin-booking-actions,
+  .admin-order-actions {
+    min-width: 132px;
+    width: 100%;
+  }
   .admin-booking-actions .a-btn,
   .admin-order-status-form .a-select { width: 100%; justify-content: center; }
+  .admin-booking-actions form,
+  .admin-order-actions form,
+  .admin-order-status-form {
+    width: 100%;
+    max-width: none;
+  }
   .admin-quick-links { grid-template-columns: repeat(2, 1fr) !important; }
   .admin-quick-link { min-width: 0; }
   .admin-category-head,
