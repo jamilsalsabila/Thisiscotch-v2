@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type GalleryItem = {
   id: number
@@ -14,28 +15,10 @@ type GalleryItem = {
 const SIZES = ['tall', '', 'wide', '', 'tall', 'wide', '', '']
 
 export default function GallerySection({ items }: { items: GalleryItem[] }) {
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const [lightbox, setLightbox] = useState<number | null>(null)
   const touchStartX = useRef<number | null>(null)
   const touchStartY = useRef<number | null>(null)
-
-  useEffect(() => {
-    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
 
   useEffect(() => {
     if (lightbox === null) return

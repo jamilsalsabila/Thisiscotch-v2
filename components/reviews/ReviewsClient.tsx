@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { submitReview } from '@/app/(public)/reviews/actions'
 import type { Database } from '@/types/database'
 import LegacyIcon from '@/components/ui/LegacyIcon'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type Review = Database['public']['Tables']['reviews']['Row']
 
@@ -76,7 +77,7 @@ interface Props {
 }
 
 export default function ReviewsClient({ published, prefillCode = '' }: Props) {
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const [showForm, setShowForm] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -88,23 +89,6 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
     reviewerName: '', bookingCode: '', orderCode: '', comment: '',
     ratings: {} as Record<string, number>,
   })
-
-  useEffect(() => {
-    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
 
   useEffect(() => {
     if (!prefillCode) return
@@ -196,15 +180,15 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
             {[1, 2, 3, 4, 5].map(s => <span key={s}>{s <= Math.round(overallAverage) ? '★' : '☆'}</span>)}
           </div>
           <div className="rev-summary__count">
-            <strong>{published.length}</strong> <span data-copy-en="total reviews" data-copy-id="total ulasan">total reviews</span>
+            <strong>{published.length}</strong> <span data-copy-en="total reviews" data-copy-id="total ulasan">{lang === 'id' ? 'total ulasan' : 'total reviews'}</span>
           </div>
         </div>
         <div className="rev-summary__cta">
           <button className="btn btn--primary" onClick={() => setShowForm(true)}>
-            <span data-copy-en="Write a Review" data-copy-id="Tulis Ulasan">Write a Review</span>
+            <span data-copy-en="Write a Review" data-copy-id="Tulis Ulasan">{lang === 'id' ? 'Tulis Ulasan' : 'Write a Review'}</span>
           </button>
           <p style={{ fontSize: '.8rem', color: 'var(--muted)', marginTop: 8, textAlign: 'center' }}>
-            <span data-copy-en="Have a booking/order code? Your review can be published automatically with a Verified badge." data-copy-id="Punya kode booking/order? Review Anda otomatis tayang & ber-badge Verified.">Have a booking/order code? Your review can be published automatically with a Verified badge.</span>
+            <span data-copy-en="Have a booking/order code? Your review can be published automatically with a Verified badge." data-copy-id="Punya kode booking/order? Review Anda otomatis tayang & ber-badge Verified.">{lang === 'id' ? 'Punya kode booking/order? Review Anda otomatis tayang & ber-badge Verified.' : 'Have a booking/order code? Your review can be published automatically with a Verified badge.'}</span>
           </p>
         </div>
       </div>
@@ -248,7 +232,7 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
                       {review.is_verified ? (
                         <span className="rev-card__verified" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '.7rem', fontWeight: 600, color: '#16a34a', background: '#dcfce7', padding: '2px 7px', borderRadius: 99, marginLeft: 6 }}>
                           <LegacyIcon name="check-badge" size={13} />
-                          <span data-copy-en="Verified" data-copy-id="Terverifikasi">Verified</span>
+                          <span data-copy-en="Verified" data-copy-id="Terverifikasi">{lang === 'id' ? 'Terverifikasi' : 'Verified'}</span>
                         </span>
                       ) : null}
                     </div>
@@ -288,9 +272,9 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
                     <div style={{ fontWeight: 600, fontSize: '.875rem' }}>{review.reviewer_name}</div>
                     <div style={{ fontSize: '.72rem', color: review.is_verified ? '#16a34a' : 'var(--muted)' }}>
                       {review.is_verified ? (
-                        <><LegacyIcon name="check-badge" size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /> <span data-copy-en="Verified Guest" data-copy-id="Tamu Terverifikasi">Verified Guest</span></>
+                        <><LegacyIcon name="check-badge" size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /> <span data-copy-en="Verified Guest" data-copy-id="Tamu Terverifikasi">{lang === 'id' ? 'Tamu Terverifikasi' : 'Verified Guest'}</span></>
                       ) : (
-                        <span data-copy-en="Public Guest" data-copy-id="Tamu Umum">Public Guest</span>
+                        <span data-copy-en="Public Guest" data-copy-id="Tamu Umum">{lang === 'id' ? 'Tamu Umum' : 'Public Guest'}</span>
                       )}
                     </div>
                   </div>
@@ -302,7 +286,7 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
         {filtered.length > visibleCount ? (
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <button type="button" className="btn btn--outline" onClick={() => setVisibleCount(v => v + 12)}>
-              <span data-copy-en="Load More" data-copy-id="Muat Lebih Banyak">Load More</span>
+              <span data-copy-en="Load More" data-copy-id="Muat Lebih Banyak">{lang === 'id' ? 'Muat Lebih Banyak' : 'Load More'}</span>
             </button>
           </div>
         ) : (
@@ -312,8 +296,8 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
       ) : (
           <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)', marginBottom: 40 }}>
             <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
-            <p style={{ fontWeight: 600, marginBottom: 8 }} data-copy-en="No reviews match this filter" data-copy-id="Tidak ada ulasan yang cocok dengan filter ini">No reviews match this filter</p>
-            <p style={{ fontSize: '.875rem' }} data-copy-en="Try another filter or be the first to share your experience." data-copy-id="Coba filter lain atau jadilah yang pertama membagikan pengalaman Anda.">Try another filter or be the first to share your experience.</p>
+            <p style={{ fontWeight: 600, marginBottom: 8 }} data-copy-en="No reviews match this filter" data-copy-id="Tidak ada ulasan yang cocok dengan filter ini">{lang === 'id' ? 'Tidak ada ulasan yang cocok dengan filter ini' : 'No reviews match this filter'}</p>
+            <p style={{ fontSize: '.875rem' }} data-copy-en="Try another filter or be the first to share your experience." data-copy-id="Coba filter lain atau jadilah yang pertama membagikan pengalaman Anda.">{lang === 'id' ? 'Coba filter lain atau jadilah yang pertama membagikan pengalaman Anda.' : 'Try another filter or be the first to share your experience.'}</p>
           </div>
       )}
 
@@ -322,12 +306,12 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', background: 'rgba(22,163,74,.08)', border: '1.5px solid #16a34a', borderRadius: 'var(--radius)', padding: 32 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🎉</div>
-            <h3 style={{ marginBottom: 8, color: '#15803d' }} data-copy-en="Thank you!" data-copy-id="Terima kasih!">Thank you!</h3>
+            <h3 style={{ marginBottom: 8, color: '#15803d' }} data-copy-en="Thank you!" data-copy-id="Terima kasih!">{lang === 'id' ? 'Terima kasih!' : 'Thank you!'}</h3>
             <p style={{ color: 'var(--muted)', fontSize: '.9rem' }} data-copy-en="Your review has been received and will appear after admin verification." data-copy-id="Ulasan Anda sudah kami terima dan akan tampil setelah diverifikasi admin.">
-              Your review has been received and will appear after admin verification.
+              {lang === 'id' ? 'Ulasan Anda sudah kami terima dan akan tampil setelah diverifikasi admin.' : 'Your review has been received and will appear after admin verification.'}
             </p>
             <button className="btn btn--outline btn--sm" style={{ marginTop: 20 }} onClick={() => { setSubmitted(false); setShowForm(false) }}>
-              <span data-copy-en="Write Another Review" data-copy-id="Tulis Ulasan Lain">Write Another Review</span>
+              <span data-copy-en="Write Another Review" data-copy-id="Tulis Ulasan Lain">{lang === 'id' ? 'Tulis Ulasan Lain' : 'Write Another Review'}</span>
             </button>
           </div>
         </div>
@@ -337,18 +321,18 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
             <div className="modal-backdrop active" style={{ display: 'flex' }} onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
               <div className="modal" style={{ maxWidth: 560 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <h3 style={{ margin: 0 }} data-copy-en="Write a Review" data-copy-id="Tulis Ulasan">Write a Review</h3>
+                  <h3 style={{ margin: 0 }} data-copy-en="Write a Review" data-copy-id="Tulis Ulasan">{lang === 'id' ? 'Tulis Ulasan' : 'Write a Review'}</h3>
                   <button type="button" className="modal-close" onClick={() => setShowForm(false)} aria-label={lang === 'id' ? 'Tutup' : 'Close'}>
                     <LegacyIcon name="x-mark" size={18} />
                   </button>
                 </div>
                 <p style={{ fontSize: '.85rem', color: 'var(--muted)', marginBottom: 18 }}>
-                  <span data-copy-en="Share your experience at Cotch. Reviews with a booking/order code can be published automatically." data-copy-id="Bagikan pengalamanmu di Cotch. Review dengan kode booking/order otomatis tayang.">Share your experience at Cotch. Reviews with a booking/order code can be published automatically.</span>
+                  <span data-copy-en="Share your experience at Cotch. Reviews with a booking/order code can be published automatically." data-copy-id="Bagikan pengalamanmu di Cotch. Review dengan kode booking/order otomatis tayang.">{lang === 'id' ? 'Bagikan pengalamanmu di Cotch. Review dengan kode booking/order otomatis tayang.' : 'Share your experience at Cotch. Reviews with a booking/order code can be published automatically.'}</span>
                 </p>
 
                 <form onSubmit={handleSubmit}>
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="Name *" data-copy-id="Nama *">Name *</label>
+                    <label className="form-label" data-copy-en="Name *" data-copy-id="Nama *">{lang === 'id' ? 'Nama *' : 'Name *'}</label>
                     <input className="form-input" required value={form.reviewerName}
                       onChange={e => setForm(f => ({ ...f, reviewerName: e.target.value }))}
                       placeholder="Nama Anda" data-placeholder-en="Your name" data-placeholder-id="Nama Anda" />
@@ -356,13 +340,13 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
 
                   <div className="date-row">
                     <div className="form-group">
-                      <label className="form-label" data-copy-en="Booking Code" data-copy-id="Kode Booking">Kode Booking</label>
+                      <label className="form-label" data-copy-en="Booking Code" data-copy-id="Kode Booking">{lang === 'id' ? 'Kode Booking' : 'Booking Code'}</label>
                       <input className="form-input" value={form.bookingCode}
                         onChange={e => setForm(f => ({ ...f, bookingCode: e.target.value.toUpperCase() }))}
                         placeholder="COTCH-..." />
                     </div>
                     <div className="form-group">
-                      <label className="form-label" data-copy-en="Order Code" data-copy-id="Kode Order">Kode Order</label>
+                      <label className="form-label" data-copy-en="Order Code" data-copy-id="Kode Order">{lang === 'id' ? 'Kode Order' : 'Order Code'}</label>
                       <input className="form-input" value={form.orderCode}
                         onChange={e => setForm(f => ({ ...f, orderCode: e.target.value.toUpperCase() }))}
                         placeholder="ORD-XXXXXX" />
@@ -373,9 +357,9 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
                   </p>
 
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="Category Ratings *" data-copy-id="Rating Kategori *">Category Ratings *</label>
+                    <label className="form-label" data-copy-en="Category Ratings *" data-copy-id="Rating Kategori *">{lang === 'id' ? 'Rating Kategori *' : 'Category Ratings *'}</label>
                     <p className="form-hint" style={{ marginTop: 0, marginBottom: 10 }} data-copy-en="Choose the categories you want to rate (you can choose more than one):" data-copy-id="Pilih kategori yang ingin Anda rating (boleh lebih dari satu):">
-                      Choose the categories you want to rate (you can choose more than one):
+                      {lang === 'id' ? 'Pilih kategori yang ingin Anda rating (boleh lebih dari satu):' : 'Choose the categories you want to rate (you can choose more than one):'}
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {formRatingKeys.map(key => {
@@ -413,13 +397,13 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
                         style={{ flex: 1, minWidth: 180 }}
                       />
                       <button type="button" className="btn btn--outline btn--sm" onClick={addCustomCategory}>
-                        <span data-copy-en="+ Add" data-copy-id="+ Tambah">+ Add</span>
+                        <span data-copy-en="+ Add" data-copy-id="+ Tambah">{lang === 'id' ? '+ Tambah' : '+ Add'}</span>
                       </button>
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="Comment" data-copy-id="Komentar">Komentar</label>
+                    <label className="form-label" data-copy-en="Comment" data-copy-id="Komentar">{lang === 'id' ? 'Komentar' : 'Comment'}</label>
                     <textarea className="form-textarea" rows={4} value={form.comment}
                       onChange={e => setForm(f => ({ ...f, comment: e.target.value }))}
                       placeholder="Bagikan pengalaman Anda… (10–1000 karakter)" data-placeholder-en="Share your experience… (10–1000 characters)" data-placeholder-id="Bagikan pengalaman Anda… (10–1000 karakter)" />
@@ -433,10 +417,10 @@ export default function ReviewsClient({ published, prefillCode = '' }: Props) {
 
                   <div className="ticket-actions-row" style={{ display: 'flex', gap: 10, marginTop: 8 }}>
                     <button type="submit" className={`btn btn--primary${submitting ? ' btn--loading' : ''}`} style={{ flex: 1, justifyContent: 'center' }} disabled={submitting}>
-                      {submitting ? '' : <span data-copy-en="Submit Review" data-copy-id="Kirim Ulasan">Submit Review</span>}
+                      {submitting ? '' : <span data-copy-en="Submit Review" data-copy-id="Kirim Ulasan">{lang === 'id' ? 'Kirim Ulasan' : 'Submit Review'}</span>}
                     </button>
                     <button type="button" className="btn btn--ghost" onClick={() => setShowForm(false)}>
-                      <span data-copy-en="Cancel" data-copy-id="Batal">Cancel</span>
+                      <span data-copy-en="Cancel" data-copy-id="Batal">{lang === 'id' ? 'Batal' : 'Cancel'}</span>
                     </button>
                   </div>
                 </form>

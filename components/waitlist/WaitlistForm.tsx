@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { joinWaitlist, cancelWaitlist } from '@/app/(public)/waitlist/actions'
 import { formatDateDisplay } from '@/utils/format'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 import { WordmarkLogo } from '@/components/ui/BrandLogo'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 const TIME_SLOTS = Array.from({ length: 19 }, (_, i) => {
   const h = Math.floor(i / 2) + 12
@@ -25,7 +26,7 @@ const HOW_IT_WORKS = [
 ]
 
 export default function WaitlistForm() {
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult]         = useState<Result | null>(null)
   const [error, setError]           = useState('')
@@ -37,24 +38,6 @@ export default function WaitlistForm() {
     partySize: '2', preferredDate: TODAY,
     preferredTime: '12:00', specialRequest: '',
   })
-
-  useEffect(() => {
-    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
 
   function set(field: string) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -114,7 +97,7 @@ export default function WaitlistForm() {
           <div className="ticket">
             <div className="ticket__header" style={{ background: 'var(--gold)' }}>
               <WordmarkLogo />
-              <div className="ticket__type" data-copy-en="Waitlist Confirmation" data-copy-id="Konfirmasi Daftar Tunggu">Waitlist Confirmation</div>
+              <div className="ticket__type" data-copy-en="Waitlist Confirmation" data-copy-id="Konfirmasi Daftar Tunggu">{lang === 'id' ? 'Konfirmasi Daftar Tunggu' : 'Waitlist Confirmation'}</div>
               <div className="ticket__code">{result.waitlistCode}</div>
             </div>
             <div className="ticket__body">
@@ -133,14 +116,14 @@ export default function WaitlistForm() {
               <div className="ticket__row">
                 <span className="ticket__key" data-copy-en="Status" data-copy-id="Status">Status</span>
                 <span className="ticket__val">
-                  <span className="ticket__status active" data-copy-en="● Waiting" data-copy-id="● Menunggu">● Waiting</span>
+                  <span className="ticket__status active" data-copy-en="● Waiting" data-copy-id="● Menunggu">{lang === 'id' ? '● Menunggu' : '● Waiting'}</span>
                 </span>
               </div>
             </div>
             <div className="ticket__footer">
-              <p data-copy-en="Save your code. We'll contact you via WhatsApp when a table is available." data-copy-id="Simpan kode Anda. Kami akan menghubungi Anda via WhatsApp saat meja tersedia.">Save your code. We&apos;ll contact you via WhatsApp when a table is available.</p>
+              <p data-copy-en="Save your code. We'll contact you via WhatsApp when a table is available." data-copy-id="Simpan kode Anda. Kami akan menghubungi Anda via WhatsApp saat meja tersedia.">{lang === 'id' ? 'Simpan kode Anda. Kami akan menghubungi Anda via WhatsApp saat meja tersedia.' : 'Save your code. We’ll contact you via WhatsApp when a table is available.'}</p>
               <button className="btn btn--ghost btn--sm" style={{ marginTop: 14 }} onClick={() => setResult(null)}>
-                <span data-copy-en="Close" data-copy-id="Tutup">Close</span>
+                <span data-copy-en="Close" data-copy-id="Tutup">{lang === 'id' ? 'Tutup' : 'Close'}</span>
               </button>
             </div>
           </div>
@@ -154,35 +137,35 @@ export default function WaitlistForm() {
       {/* Left: form */}
       <div>
         <form className="waitlist-form" onSubmit={handleSubmit}>
-          <h3 style={{ marginBottom: 20 }} data-copy-en="Your Details" data-copy-id="Detail Anda">Your Details</h3>
+          <h3 style={{ marginBottom: 20 }} data-copy-en="Your Details" data-copy-id="Detail Anda">{lang === 'id' ? 'Detail Anda' : 'Your Details'}</h3>
 
           <div className="form-group">
-            <label className="form-label" data-copy-en="Full Name" data-copy-id="Nama Lengkap">Full Name</label>
+            <label className="form-label" data-copy-en="Full Name" data-copy-id="Nama Lengkap">{lang === 'id' ? 'Nama Lengkap' : 'Full Name'}</label>
             <input className="form-input" required value={form.name} onChange={set('name')} placeholder="Your name" data-placeholder-en="Your name" data-placeholder-id="Nama Anda" />
           </div>
 
           <div className="form-group">
-            <label className="form-label" data-copy-en="WhatsApp Number" data-copy-id="Nomor WhatsApp">WhatsApp Number</label>
+            <label className="form-label" data-copy-en="WhatsApp Number" data-copy-id="Nomor WhatsApp">{lang === 'id' ? 'Nomor WhatsApp' : 'WhatsApp Number'}</label>
             <input className="form-input" required type="tel" value={form.phone} onChange={set('phone')} placeholder="+62..." />
           </div>
 
           <div className="form-group">
-            <label className="form-label" data-copy-en="Email (optional)" data-copy-id="Email (opsional)">Email (optional)</label>
+            <label className="form-label" data-copy-en="Email (optional)" data-copy-id="Email (opsional)">{lang === 'id' ? 'Email (opsional)' : 'Email (optional)'}</label>
             <input className="form-input" type="email" value={form.email} onChange={set('email')} placeholder="your@email.com" data-placeholder-en="your@email.com" data-placeholder-id="email@anda.com" />
           </div>
 
           <div className="form-group">
-            <label className="form-label" data-copy-en="Party Size" data-copy-id="Jumlah Tamu">Party Size</label>
+            <label className="form-label" data-copy-en="Party Size" data-copy-id="Jumlah Tamu">{lang === 'id' ? 'Jumlah Tamu' : 'Party Size'}</label>
             <input className="form-input" type="number" required min={1} max={20} value={form.partySize} onChange={set('partySize')} />
           </div>
 
           <div className="date-row">
             <div className="form-group">
-              <label className="form-label" data-copy-en="Preferred Date" data-copy-id="Tanggal Pilihan">Preferred Date</label>
+              <label className="form-label" data-copy-en="Preferred Date" data-copy-id="Tanggal Pilihan">{lang === 'id' ? 'Tanggal Pilihan' : 'Preferred Date'}</label>
               <input className="form-input" type="date" required min={TODAY} value={form.preferredDate} onChange={set('preferredDate')} />
             </div>
             <div className="form-group">
-              <label className="form-label" data-copy-en="Preferred Time" data-copy-id="Waktu Pilihan">Preferred Time</label>
+              <label className="form-label" data-copy-en="Preferred Time" data-copy-id="Waktu Pilihan">{lang === 'id' ? 'Waktu Pilihan' : 'Preferred Time'}</label>
               <select className="form-select" value={form.preferredTime} onChange={set('preferredTime')}>
                 {TIME_SLOTS.map(t => <option key={t} value={t}>{t} WIB</option>)}
               </select>
@@ -190,7 +173,7 @@ export default function WaitlistForm() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" data-copy-en="Special Request" data-copy-id="Permintaan Khusus">Special Request</label>
+            <label className="form-label" data-copy-en="Special Request" data-copy-id="Permintaan Khusus">{lang === 'id' ? 'Permintaan Khusus' : 'Special Request'}</label>
             <textarea className="form-textarea" value={form.specialRequest} onChange={set('specialRequest')} placeholder="Any preferences or requirements..." data-placeholder-en="Any preferences or requirements..." data-placeholder-id="Ada preferensi atau kebutuhan khusus..." />
           </div>
 
@@ -201,7 +184,7 @@ export default function WaitlistForm() {
           )}
 
           <button type="submit" className={`btn btn--primary w-full${submitting ? ' btn--loading' : ''}`} disabled={submitting}>
-            {submitting ? '' : <span data-copy-en="Join Waitlist" data-copy-id="Masuk Daftar Tunggu">Join Waitlist</span>}
+            {submitting ? '' : <span data-copy-en="Join Waitlist" data-copy-id="Masuk Daftar Tunggu">{lang === 'id' ? 'Masuk Daftar Tunggu' : 'Join Waitlist'}</span>}
           </button>
         </form>
       </div>
@@ -210,7 +193,7 @@ export default function WaitlistForm() {
       <div>
         {/* How It Works */}
         <div style={{ marginBottom: 28 }}>
-          <h3 style={{ marginBottom: 16 }} data-copy-en="How It Works" data-copy-id="Cara Kerjanya">How It Works</h3>
+          <h3 style={{ marginBottom: 16 }} data-copy-en="How It Works" data-copy-id="Cara Kerjanya">{lang === 'id' ? 'Cara Kerjanya' : 'How It Works'}</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {HOW_IT_WORKS.map(({ icon, titleEn, titleId, descEn, descId }, i) => (
               <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
@@ -230,13 +213,13 @@ export default function WaitlistForm() {
         <div style={{ padding: 20, background: 'rgba(196,18,48,.06)', border: '1.5px solid rgba(196,18,48,.2)', borderRadius: 'var(--radius-sm)', marginBottom: 24 }}>
           <strong style={{ color: 'var(--red)', fontSize: '.9rem' }} data-copy-en="💡 Tip" data-copy-id="💡 Tip">💡 Tip</strong>
           <p style={{ fontSize: '.82rem', color: 'var(--muted)', marginTop: 6, lineHeight: 1.6 }}>
-            <span data-copy-en="If you already have a booking code, check your status at the " data-copy-id="Jika Anda sudah punya kode booking, cek status Anda di halaman ">If you already have a booking code, check your status at the </span><Link href="/lookup" style={{ color: 'var(--red)', fontWeight: 600 }} data-copy-en="My Booking" data-copy-id="Booking Saya">My Booking</Link><span data-copy-en=" page." data-copy-id="."> page.</span>
+            <span data-copy-en="If you already have a booking code, check your status at the " data-copy-id="Jika Anda sudah punya kode booking, cek status Anda di halaman ">{lang === 'id' ? 'Jika Anda sudah punya kode booking, cek status Anda di halaman ' : 'If you already have a booking code, check your status at the '}</span><Link href="/lookup" style={{ color: 'var(--red)', fontWeight: 600 }} data-copy-en="My Booking" data-copy-id="Booking Saya">{lang === 'id' ? 'Booking Saya' : 'My Booking'}</Link><span data-copy-en=" page." data-copy-id=".">{lang === 'id' ? '.' : ' page.'}</span>
           </p>
         </div>
 
         {/* Cancel Waitlist */}
         <div style={{ padding: 20, background: 'var(--cream-dark)', borderRadius: 'var(--radius-sm)' }}>
-          <h4 style={{ fontSize: '.95rem', marginBottom: 12 }} data-copy-en="Cancel Waitlist" data-copy-id="Batalkan Daftar Tunggu">Cancel Waitlist</h4>
+          <h4 style={{ fontSize: '.95rem', marginBottom: 12 }} data-copy-en="Cancel Waitlist" data-copy-id="Batalkan Daftar Tunggu">{lang === 'id' ? 'Batalkan Daftar Tunggu' : 'Cancel Waitlist'}</h4>
           <form onSubmit={handleCancel}>
             <div className="waitlist-cancel-row" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <input
@@ -254,7 +237,7 @@ export default function WaitlistForm() {
                 style={{ background: '#dc2626', color: '#fff', border: 'none' }}
                 disabled={cancelling}
               >
-                {cancelling ? '' : <span data-copy-en="Cancel" data-copy-id="Batalkan">Cancel</span>}
+                {cancelling ? '' : <span data-copy-en="Cancel" data-copy-id="Batalkan">{lang === 'id' ? 'Batalkan' : 'Cancel'}</span>}
               </button>
             </div>
           </form>

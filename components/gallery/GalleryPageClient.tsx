@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type GalleryItem = {
   id: number
@@ -20,27 +21,7 @@ const FILTERS = [
 
 export default function GalleryPageClient({ items }: { items: GalleryItem[] }) {
   const [filter, setFilter] = useState('all')
-  const [lang, setLang] = useState<'en' | 'id'>('en')
-
-  useEffect(() => {
-    const applyLang = (value?: string) => {
-      setLang(value === 'id' ? 'id' : 'en')
-    }
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
+  const lang = usePublicLanguage()
 
   const filtered = useMemo(
     () => (filter === 'all' ? items : items.filter(item => item.section === filter)),

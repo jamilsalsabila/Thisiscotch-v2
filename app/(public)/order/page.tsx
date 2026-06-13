@@ -5,6 +5,7 @@ import { getSiteData } from '@/lib/site'
 import { buildMenuPresentation, type MenuItem } from '@/lib/menu'
 import OrderClient from '@/components/order/OrderClient'
 import LegacyIcon from '@/components/ui/LegacyIcon'
+import { getPublicLang } from '@/lib/server-lang'
 
 export const metadata: Metadata = { title: 'Order Online' }
 export const dynamic = 'force-dynamic'
@@ -26,15 +27,16 @@ const getMenuItems = unstable_cache(
 )
 
 export default async function OrderPage() {
+  const lang = await getPublicLang()
   const [items, site] = await Promise.all([getMenuItems(), getSiteData()])
   const { grouped, categories, labels } = buildMenuPresentation(items, site)
   return (
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Order" data-copy-id="Order">Order</div>
-          <h1 data-copy-en="Order Online" data-copy-id="Order Online">Order Online</h1>
-          <p data-copy-en="Order from your table or ahead of your visit." data-copy-id="Order langsung dari meja Anda atau sebelum Anda datang.">Order from your table or ahead of your visit.</p>
+          <div className="section-label" data-copy-en="Order" data-copy-id="Order">{lang === 'id' ? 'Order' : 'Order'}</div>
+          <h1 data-copy-en="Order Online" data-copy-id="Order Online">{lang === 'id' ? 'Order Online' : 'Order Online'}</h1>
+          <p data-copy-en="Order from your table or ahead of your visit." data-copy-id="Order langsung dari meja Anda atau sebelum Anda datang.">{lang === 'id' ? 'Order langsung dari meja Anda atau sebelum Anda datang.' : 'Order from your table or ahead of your visit.'}</p>
         </div>
       </div>
       {!site.isOpen ? (
@@ -44,9 +46,11 @@ export default async function OrderPage() {
               <LegacyIcon name="moon" size={20} />
             </span>
             <div>
-              <strong data-copy-en="Cafe is closed." data-copy-id="Cafe sedang tutup.">Cafe is closed.</strong>{' '}
+              <strong data-copy-en="Cafe is closed." data-copy-id="Cafe sedang tutup.">{lang === 'id' ? 'Cafe sedang tutup.' : 'Cafe is closed.'}</strong>{' '}
               <span data-copy-en={`You can still browse the menu, but new orders are only available during opening hours (${site.openTime}–${site.closeTime}).`} data-copy-id={`Anda masih bisa lihat-lihat menu, tapi order baru bisa dilakukan saat jam operasional (${site.openTime}–${site.closeTime}).`}>
-                You can still browse the menu, but new orders are only available during opening hours ({site.openTime}–{site.closeTime}).
+                {lang === 'id'
+                  ? `Anda masih bisa lihat-lihat menu, tapi order baru bisa dilakukan saat jam operasional (${site.openTime}–${site.closeTime}).`
+                  : `You can still browse the menu, but new orders are only available during opening hours (${site.openTime}–${site.closeTime}).`}
               </span>
             </div>
           </div>

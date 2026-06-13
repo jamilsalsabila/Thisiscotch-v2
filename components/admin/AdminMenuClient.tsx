@@ -115,11 +115,7 @@ export default function AdminMenuClient({
 
   return (
     <>
-      <div className="admin-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 12, flexWrap: 'wrap' }}>
-        <div>
-          <div className="admin-page-title" style={{ marginBottom: 4 }}>Menu Management</div>
-          <p style={{ fontSize: '.85rem', color: 'var(--a-muted)' }}>Manage menu items, pricing, availability, and featured labels.</p>
-        </div>
+      <div className="admin-toolbar" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16, gap: 12, flexWrap: 'wrap' }}>
         <MenuForm categories={categories.length ? categories : ['drink', 'food', 'pastry']} categoryMap={categoryMap} />
       </div>
 

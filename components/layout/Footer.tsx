@@ -2,8 +2,9 @@ import Link from 'next/link'
 import type { SiteData } from '@/lib/site'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 import { WordmarkLogo } from '@/components/ui/BrandLogo'
+import type { PublicLang } from '@/lib/server-lang'
 
-export default function Footer({ site }: { site: SiteData }) {
+export default function Footer({ site, lang }: { site: SiteData; lang: PublicLang }) {
   const year = new Date().getFullYear()
   const socialLinks = [
     {
@@ -59,7 +60,9 @@ export default function Footer({ site }: { site: SiteData }) {
               data-copy-en="A place to slow down, sip something great, and feel at home. Come as you are — stay as long as you like."
               data-copy-id="Tempat untuk bersantai, menikmati minuman terbaik, dan merasa seperti di rumah."
             >
-              A place to slow down, sip something great, and feel at home. Come as you are — stay as long as you like.
+              {lang === 'id'
+                ? 'Tempat untuk bersantai, menikmati minuman terbaik, dan merasa seperti di rumah.'
+                : 'A place to slow down, sip something great, and feel at home. Come as you are — stay as long as you like.'}
             </p>
             <div className="footer__social">
               {socialLinks.map(item => (
@@ -79,7 +82,7 @@ export default function Footer({ site }: { site: SiteData }) {
           </div>
 
           <div>
-            <p className="footer__heading" data-copy-en="Explore" data-copy-id="Jelajahi">Explore</p>
+            <p className="footer__heading" data-copy-en="Explore" data-copy-id="Jelajahi">{lang === 'id' ? 'Jelajahi' : 'Explore'}</p>
             <ul className="footer__links">
               {[
                 { href: '/', en: 'Home', id: 'Beranda' },
@@ -88,14 +91,14 @@ export default function Footer({ site }: { site: SiteData }) {
                 { href: '/about', en: 'About Us', id: 'Tentang Kami' },
               ].map(({ href, en, id }) => (
                 <li key={href}>
-                  <Link href={href} className="footer-link" data-copy-en={en} data-copy-id={id}>{en}</Link>
+                  <Link href={href} className="footer-link" data-copy-en={en} data-copy-id={id}>{lang === 'id' ? id : en}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <p className="footer__heading" data-copy-en="Services" data-copy-id="Layanan">Services</p>
+            <p className="footer__heading" data-copy-en="Services" data-copy-id="Layanan">{lang === 'id' ? 'Layanan' : 'Services'}</p>
             <ul className="footer__links">
               {[
                 { href: '/booking', en: 'Table Reservation', id: 'Reservasi Meja' },
@@ -104,14 +107,14 @@ export default function Footer({ site }: { site: SiteData }) {
                 { href: '/lookup', en: 'My Booking', id: 'Pesanan Saya' },
               ].map(({ href, en, id }) => (
                 <li key={href}>
-                  <Link href={href} className="footer-link" data-copy-en={en} data-copy-id={id}>{en}</Link>
+                  <Link href={href} className="footer-link" data-copy-en={en} data-copy-id={id}>{lang === 'id' ? id : en}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <p className="footer__heading" data-copy-en="Visit Us" data-copy-id="Kunjungi Kami">Visit Us</p>
+            <p className="footer__heading" data-copy-en="Visit Us" data-copy-id="Kunjungi Kami">{lang === 'id' ? 'Kunjungi Kami' : 'Visit Us'}</p>
             <ul className="footer__links">
               <li style={{ fontSize: '.82rem', lineHeight: 1.65 }} data-copy-en={site.locationEn} data-copy-id={site.locationId}>{site.locationId}</li>
               <li style={{ marginTop: 8 }}>
@@ -127,7 +130,7 @@ export default function Footer({ site }: { site: SiteData }) {
                 data-copy-en={`${site.daysText}, ${site.openTime}–${site.closeTime} WIB`}
                 data-copy-id={`${site.daysTextId}, ${site.openTime}–${site.closeTime} WIB`}
               >
-                {site.daysText}, {site.openTime}–{site.closeTime} WIB
+                {lang === 'id' ? site.daysTextId : site.daysText}, {site.openTime}–{site.closeTime} WIB
               </li>
               <li style={{ marginTop: 10 }}>
                 <span
@@ -135,7 +138,9 @@ export default function Footer({ site }: { site: SiteData }) {
                   data-copy-en={site.isOpen ? 'Open Now' : 'Closed'}
                   data-copy-id={site.isOpen ? 'Buka Sekarang' : 'Tutup'}
                 >
-                  {site.isOpen ? 'Open Now' : 'Closed'}
+                  {lang === 'id'
+                    ? (site.isOpen ? 'Buka Sekarang' : 'Tutup')
+                    : (site.isOpen ? 'Open Now' : 'Closed')}
                 </span>
               </li>
             </ul>
@@ -146,7 +151,7 @@ export default function Footer({ site }: { site: SiteData }) {
           <div className="container">
             <div className="footer__bottom">
               <span data-copy-en={`© ${year} Cotch. All rights reserved.`} data-copy-id={`© ${year} Cotch. Hak cipta dilindungi.`}>
-                &copy; {year} Cotch. All rights reserved.
+                &copy; {year} Cotch. {lang === 'id' ? 'Hak cipta dilindungi.' : 'All rights reserved.'}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <div className="visitor-counter">
@@ -156,7 +161,7 @@ export default function Footer({ site }: { site: SiteData }) {
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
-                  <span data-copy-en="Visitors" data-copy-id="Pengunjung">Visitors</span>: <span>{site.visitorCount.toLocaleString('id-ID')}</span>
+                  <span data-copy-en="Visitors" data-copy-id="Pengunjung">{lang === 'id' ? 'Pengunjung' : 'Visitors'}</span>: <span>{site.visitorCount.toLocaleString('id-ID')}</span>
                 </div>
               </div>
             </div>

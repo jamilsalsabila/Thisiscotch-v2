@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { saveSchedule } from '@/app/admin/actions'
 import { getSiteData } from '@/lib/site'
 import LegacyIcon from '@/components/ui/LegacyIcon'
+import AdminScheduleTable from '@/components/admin/AdminScheduleTable'
 
 function parseSchedule(value: string | undefined) {
   if (!value) return {} as Record<string, { is_open: boolean; open: string; close: string }>
@@ -61,49 +62,7 @@ export default async function AdminSchedulePage({
           Toggle each day open or closed, then set its opening and closing time. Changes take effect immediately.
         </p>
 
-        <div className="a-table-wrap">
-          <table className="day-schedule-table">
-            <thead>
-              <tr>
-                <th style={{ width: 180 }}>Day</th>
-                <th style={{ width: 80 }}>Open?</th>
-                <th>Opening Time</th>
-                <th>Closing Time</th>
-                <th style={{ width: 120 }}>Preview</th>
-              </tr>
-            </thead>
-            <tbody>
-              {days.map(day => {
-                const item = schedule[String(day.id)] ?? { is_open: true, open: '12:00', close: '21:00' }
-                const isToday = day.id === todayIso
-                return (
-                  <tr key={day.id} className={`${isToday ? 'today ' : ''}${item.is_open ? '' : 'day-closed'}`.trim()}>
-                    <td>
-                      <div className="day-name-cell">
-                        <span className={`day-dot ${item.is_open ? 'open' : 'closed'}`} />
-                        <span style={{ fontWeight: 500 }}>{day.label}</span>
-                        {isToday ? <span className="today-tag">TODAY</span> : null}
-                      </div>
-                    </td>
-                    <td>
-                      <label className="a-toggle">
-                        <input type="checkbox" name={`day_open_${day.id}`} defaultChecked={item.is_open} />
-                        <span className="a-toggle__slider" />
-                      </label>
-                    </td>
-                    <td><input className="a-input" type="time" name={`open_${day.id}`} defaultValue={item.open} /></td>
-                    <td><input className="a-input" type="time" name={`close_${day.id}`} defaultValue={item.close} /></td>
-                    <td>
-                      <span className={`a-badge ${item.is_open ? 'a-badge--green' : 'a-badge--red'}`}>
-                        {item.is_open ? `${item.open} – ${item.close}` : 'Closed'}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+        <AdminScheduleTable days={days} initialSchedule={schedule} todayIso={todayIso} />
       </div>
 
       <div className="a-card">

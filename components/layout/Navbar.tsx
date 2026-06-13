@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 import { NavBrandLogo } from '@/components/ui/BrandLogo'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 const links = [
   { href: '/',         en: 'Home',     id: 'Beranda' },
@@ -22,33 +23,11 @@ export default function Navbar() {
   const [scrolled, setScrolled]     = useState(false)
   const [menuOpen, setMenuOpen]     = useState(false)
   const [dark, setDark]             = useState(false)
-  const [lang, setLang]             = useState<'EN' | 'ID'>('EN')
+  const lang = usePublicLanguage() === 'id' ? 'ID' : 'EN'
 
   useEffect(() => {
     const saved = localStorage.getItem('cotch_theme')
     if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); setDark(true) }
-    const savedLang = localStorage.getItem('cotch_lang')
-    if (savedLang) setLang(savedLang.toUpperCase() as 'EN' | 'ID')
-  }, [])
-
-  useEffect(() => {
-    const syncLang = (value?: string) => setLang(value === 'id' ? 'ID' : 'EN')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        syncLang(detail)
-        return
-      }
-      syncLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    window.addEventListener('storage', onLangChanged as EventListener)
-    return () => {
-      document.removeEventListener('langChanged', onLangChanged)
-      window.removeEventListener('storage', onLangChanged as EventListener)
-    }
   }, [])
 
   useEffect(() => {
@@ -70,10 +49,10 @@ export default function Navbar() {
   function toggleLang(l: 'EN' | 'ID') {
     if (lang === l) return
 
-    setLang(l)
     const lower = l.toLowerCase() as 'en' | 'id'
     document.documentElement.lang = lower
     localStorage.setItem('cotch_lang', lower)
+    document.cookie = `cotch_lang=${lower}; path=/; max-age=31536000; samesite=lax`
     document.dispatchEvent(new CustomEvent('langChanged', { detail: { lang: lower } }))
     window.dispatchEvent(new CustomEvent('cotch:lang', { detail: lower }))
   }

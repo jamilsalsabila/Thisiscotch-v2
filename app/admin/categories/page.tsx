@@ -40,11 +40,7 @@ export default async function AdminCategoriesPage() {
 
   return (
     <>
-      <div className="admin-toolbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
-        <div>
-          <div className="admin-page-title" style={{ marginBottom: 4 }}>Categories &amp; Subcategories</div>
-          <p style={{ fontSize: '.85rem', color: 'var(--a-muted)' }}>Manage menu groups and the subcategories used by menu items.</p>
-        </div>
+      <div className="admin-toolbar" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
         <Link href="/admin/menu" className="a-btn a-btn--outline a-btn--sm">← Menu</Link>
       </div>
 

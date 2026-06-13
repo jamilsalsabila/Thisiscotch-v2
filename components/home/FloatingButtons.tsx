@@ -2,33 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import { ArrowUpIcon } from '@heroicons/react/24/outline'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 export default function FloatingButtons({ whatsappUrl }: { whatsappUrl: string }) {
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const [showTop, setShowTop] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 400)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
   }, [])
 
   return (

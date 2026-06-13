@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { formatRupiah } from '@/utils/format'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type MenuItem = {
   id: number
@@ -29,27 +30,7 @@ export default function MenuPageClient({
   labels: CategoryLabels
 }) {
   const [activeTab, setActiveTab] = useState('all')
-  const [lang, setLang] = useState<'en' | 'id'>('en')
-
-  useEffect(() => {
-    const applyLang = (value?: string) => {
-      setLang(value === 'id' ? 'id' : 'en')
-    }
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
+  const lang = usePublicLanguage()
 
   const allTabs = useMemo(() => ['all', ...categories], [categories])
 

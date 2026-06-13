@@ -1,18 +1,20 @@
 import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import GalleryPageClient from '@/components/gallery/GalleryPageClient'
+import { getPublicLang } from '@/lib/server-lang'
 
 export const metadata = { title: 'Gallery — Cotch' }
 export const dynamic = 'force-dynamic'
 
 export default async function GalleryPage() {
+  const lang = await getPublicLang()
   if (!hasAdminSupabaseEnv()) {
     return (
       <>
         <div className="page-hero">
           <div className="container">
-            <div className="section-label" data-copy-en="Photos" data-copy-id="Foto">Photos</div>
-            <h1 data-copy-en="Inside Cotch" data-copy-id="Di Dalam Cotch">Inside Cotch</h1>
-            <p data-copy-en="Spaces designed to make you feel at home — inside and out." data-copy-id="Ruang yang dirancang agar kamu merasa betah — di dalam maupun di luar.">Spaces designed to make you feel at home — inside and out.</p>
+            <div className="section-label" data-copy-en="Photos" data-copy-id="Foto">{lang === 'id' ? 'Foto' : 'Photos'}</div>
+            <h1 data-copy-en="Inside Cotch" data-copy-id="Di Dalam Cotch">{lang === 'id' ? 'Di Dalam Cotch' : 'Inside Cotch'}</h1>
+            <p data-copy-en="Spaces designed to make you feel at home — inside and out." data-copy-id="Ruang yang dirancang agar kamu merasa betah — di dalam maupun di luar.">{lang === 'id' ? 'Ruang yang dirancang agar kamu merasa betah — di dalam maupun di luar.' : 'Spaces designed to make you feel at home — inside and out.'}</p>
           </div>
         </div>
         <section className="section">
@@ -35,9 +37,9 @@ export default async function GalleryPage() {
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Photos" data-copy-id="Foto">Photos</div>
-          <h1 data-copy-en="Inside Cotch" data-copy-id="Di Dalam Cotch">Inside Cotch</h1>
-          <p data-copy-en="Spaces designed to make you feel at home — inside and out." data-copy-id="Ruang yang dirancang agar kamu merasa betah — di dalam maupun di luar.">Spaces designed to make you feel at home — inside and out.</p>
+          <div className="section-label" data-copy-en="Photos" data-copy-id="Foto">{lang === 'id' ? 'Foto' : 'Photos'}</div>
+          <h1 data-copy-en="Inside Cotch" data-copy-id="Di Dalam Cotch">{lang === 'id' ? 'Di Dalam Cotch' : 'Inside Cotch'}</h1>
+          <p data-copy-en="Spaces designed to make you feel at home — inside and out." data-copy-id="Ruang yang dirancang agar kamu merasa betah — di dalam maupun di luar.">{lang === 'id' ? 'Ruang yang dirancang agar kamu merasa betah — di dalam maupun di luar.' : 'Spaces designed to make you feel at home — inside and out.'}</p>
         </div>
       </div>
       <section className="section">

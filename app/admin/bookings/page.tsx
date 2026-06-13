@@ -28,36 +28,18 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
     (supabase.from('floor_tables').select('*') as any),
   ])
 
-  const now = new Date()
-  const overdueIds = (((bookings as any[]) ?? []).filter(item => {
-    if (item.status !== 'active') return false
-    const end = new Date(`${item.booking_date}T${item.booking_time}`)
-    end.setHours(end.getHours() + 2)
-    return end <= now
-  }).map(item => item.id))
-
-  if (overdueIds.length > 0) {
-    await (supabase.from('bookings') as any).update({ status: 'completed', is_seen: true }).in('id', overdueIds)
-  }
-
   await (supabase.from('bookings') as any)
     .update({ is_seen: true })
     .eq('is_seen', false)
 
-  const normalizedBookings = (((bookings as any[]) ?? []).map(item => ({
-    ...item,
-    status: overdueIds.includes(item.id) ? 'completed' : item.status,
-    is_seen: true,
-  })))
-
   const tableMap = new Map((((floorTables as any[]) ?? []).map(item => [item.id, item])))
-  const bookingCount = normalizedBookings.length
+  const bookingCount = ((bookings as any[]) ?? []).length
   const waitlistCount = ((waitlist as any[]) ?? []).length
   const orderCount = ((orders as any[]) ?? []).length
 
   const term = q.trim().toLowerCase()
 
-  const bookingRows = ((normalizedBookings.map(item => {
+  const bookingRows = ((((bookings as any[]) ?? []).map(item => {
     const table = tableMap.get(item.table_id)
     return {
       ...item,
@@ -133,31 +115,19 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                     <td>{booking.booking_date}</td>
                     <td>{booking.booking_time}</td>
                     <td>{booking.party_size} pax</td>
-                    <td><span className={`a-badge ${booking.status === 'active' ? 'a-badge--green' : booking.status === 'completed' ? 'a-badge--blue' : 'a-badge--red'}`}>{booking.status}</span></td>
+                    <td><span className={`a-badge ${booking.status === 'active' ? 'a-badge--green' : 'a-badge--red'}`}>{booking.status}</span></td>
                     <td className="admin-booking-actions" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                       {booking.status === 'active' && (
-                        <>
-                          <AdminActionForm
-                            action={async () => {
-                              'use server'
-                              await updateBookingStatus(booking.id, 'completed')
-                              redirect(bookingsPageUrl('bookings', 'Booking ditandai selesai.', q))
-                            }}
-                            confirmMessage="Tandai booking ini selesai?"
-                          >
-                            <button type="submit" className="a-btn a-btn--xs" style={{ background: '#0ea5e9', color: '#fff', border: 'none' }}>Complete</button>
-                          </AdminActionForm>
-                          <AdminActionForm
-                            action={async () => {
-                              'use server'
-                              await updateBookingStatus(booking.id, 'cancelled')
-                              redirect(bookingsPageUrl('bookings', 'Booking dibatalkan.', q))
-                            }}
-                            confirmMessage="Batalkan booking ini?"
-                          >
-                            <button type="submit" className="a-btn a-btn--danger a-btn--xs">Cancel</button>
-                          </AdminActionForm>
-                        </>
+                        <AdminActionForm
+                          action={async () => {
+                            'use server'
+                            await updateBookingStatus(booking.id, 'cancelled')
+                            redirect(bookingsPageUrl('bookings', 'Booking dibatalkan.', q))
+                          }}
+                          confirmMessage="Batalkan booking ini?"
+                        >
+                          <button type="submit" className="a-btn a-btn--danger a-btn--xs">Cancel</button>
+                        </AdminActionForm>
                       )}
                     </td>
                   </tr>

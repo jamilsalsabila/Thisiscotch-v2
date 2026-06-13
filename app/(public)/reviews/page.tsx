@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import ReviewsClient from '@/components/reviews/ReviewsClient'
+import { getPublicLang } from '@/lib/server-lang'
 
 export const metadata: Metadata = { title: 'Customer Reviews' }
 export const dynamic = 'force-dynamic'
@@ -27,6 +28,7 @@ export default async function ReviewsPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>
 }) {
   const published = await getPublishedReviews()
+  const lang = await getPublicLang()
   const params = await searchParams
   const codeValue = params?.code
   const prefillCode = Array.isArray(codeValue) ? codeValue[0] : codeValue
@@ -34,9 +36,9 @@ export default async function ReviewsPage({
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Reviews" data-copy-id="Ulasan">Reviews</div>
-          <h1 data-copy-en="What Our Guests Say" data-copy-id="Apa Kata Tamu Kami">What Our Guests Say</h1>
-          <p data-copy-en="Real stories from real visitors. Tell us yours." data-copy-id="Cerita nyata dari pengunjung nyata. Ceritakan pengalamanmu juga.">Real stories from real visitors. Tell us yours.</p>
+          <div className="section-label" data-copy-en="Reviews" data-copy-id="Ulasan">{lang === 'id' ? 'Ulasan' : 'Reviews'}</div>
+          <h1 data-copy-en="What Our Guests Say" data-copy-id="Apa Kata Tamu Kami">{lang === 'id' ? 'Apa Kata Tamu Kami' : 'What Our Guests Say'}</h1>
+          <p data-copy-en="Real stories from real visitors. Tell us yours." data-copy-id="Cerita nyata dari pengunjung nyata. Ceritakan pengalamanmu juga.">{lang === 'id' ? 'Cerita nyata dari pengunjung nyata. Ceritakan pengalamanmu juga.' : 'Real stories from real visitors. Tell us yours.'}</p>
         </div>
       </div>
       <section className="section">

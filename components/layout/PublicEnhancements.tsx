@@ -69,6 +69,7 @@ export default function PublicEnhancements() {
     const applyResolvedLanguage = (value?: string) => {
       const normalized = value === 'id' ? 'id' : 'en'
       localStorage.setItem('cotch_lang', normalized)
+      document.cookie = `cotch_lang=${normalized}; path=/; max-age=31536000; samesite=lax`
       document.documentElement.lang = normalized
       applyLanguageToDom(normalized)
       document.dispatchEvent(new CustomEvent('langChanged', { detail: { lang: normalized } }))

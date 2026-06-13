@@ -7,6 +7,7 @@ import LegacyIcon from '@/components/ui/LegacyIcon'
 import type { Database } from '@/types/database'
 import GallerySection from '@/components/home/GallerySection'
 import FeaturedMenuHighlights from '@/components/home/FeaturedMenuHighlights'
+import { getPublicLang } from '@/lib/server-lang'
 import {
   MapPinIcon,
   ClockIcon,
@@ -57,9 +58,10 @@ const getHomeData = unstable_cache(
 )
 
 export default async function HomePage() {
-  const [{ menuItems, gallery, reviews, totalMenuItems, totalTables }, site] = await Promise.all([
+  const [{ menuItems, gallery, reviews, totalMenuItems, totalTables }, site, lang] = await Promise.all([
     getHomeData(),
     getSiteData(),
+    getPublicLang(),
   ])
 
   return (
@@ -76,7 +78,7 @@ export default async function HomePage() {
                 data-copy-en={site.isOpen ? 'Open Now' : 'Closed'}
                 data-copy-id={site.isOpen ? 'Buka Sekarang' : 'Tutup'}
               >
-                {site.isOpen ? 'Open Now' : 'Closed'}
+                {lang === 'id' ? (site.isOpen ? 'Buka Sekarang' : 'Tutup') : (site.isOpen ? 'Open Now' : 'Closed')}
               </span>
               <div className="hero__weather" id="weatherBadge" title="Current weather in Bandung" data-title-en="Current weather in Bandung" data-title-id="Cuaca saat ini di Bandung">
                 <span id="wIcon">🌡️</span>
@@ -92,7 +94,9 @@ export default async function HomePage() {
               data-copy-id="Di Setiap Tegukan<br>Ada <em>Cerita</em>"
               data-copy-mode="html"
             >
-              Where Every Sip<br />Tells a <em>Story</em>
+              {lang === 'id'
+                ? <><span>Di Setiap Tegukan</span><br /><span>Ada <em>Cerita</em></span></>
+                : <><span>Where Every Sip</span><br /><span>Tells a <em>Story</em></span></>}
             </h1>
             <p
               className="hero__subtitle"
@@ -101,7 +105,9 @@ export default async function HomePage() {
               data-copy-en="Premium coffee, warm ambiance, and a space designed for those who appreciate the finer things in life."
               data-copy-id="Kopi premium, suasana hangat, dan ruang yang dirancang untuk mereka yang menghargai hal-hal terbaik dalam hidup."
             >
-              Premium coffee, warm ambiance, and a space designed for those who appreciate the finer things in life.
+              {lang === 'id'
+                ? 'Kopi premium, suasana hangat, dan ruang yang dirancang untuk mereka yang menghargai hal-hal terbaik dalam hidup.'
+                : 'Premium coffee, warm ambiance, and a space designed for those who appreciate the finer things in life.'}
             </p>
 
             <div className="hero__cta" data-aos="fade-up" data-aos-delay="200">
@@ -113,28 +119,28 @@ export default async function HomePage() {
                     <rect x="3" y="5" width="18" height="17" rx="2" />
                     <path d="M3 10h18" />
                   </svg>
-                  <span data-copy-en="Reserve a Table" data-copy-id="Reservasi Meja">Reserve a Table</span>
+                  <span data-copy-en="Reserve a Table" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Reserve a Table'}</span>
                 </span>
               </Link>
               <Link href="/menu" className="btn btn--outline btn--lg">
-                <span data-copy-en="See Our Menu" data-copy-id="Lihat Menu Kami">See Our Menu</span>
+                <span data-copy-en="See Our Menu" data-copy-id="Lihat Menu Kami">{lang === 'id' ? 'Lihat Menu Kami' : 'See Our Menu'}</span>
               </Link>
             </div>
 
             <div className="hero__stats" data-aos="fade-up" data-aos-delay="300">
               <div>
                 <div className="hero__stat-num"><span id="statTables" data-value={totalTables}>{totalTables}</span>+</div>
-                <div className="hero__stat-label" data-copy-en="Tables" data-copy-id="Meja">Tables</div>
+                <div className="hero__stat-label" data-copy-en="Tables" data-copy-id="Meja">{lang === 'id' ? 'Meja' : 'Tables'}</div>
               </div>
               <div style={{ width: 1, background: 'var(--border)' }} />
               <div>
                 <div className="hero__stat-num"><span id="statMenu" data-value={totalMenuItems}>{totalMenuItems}</span>+</div>
-                <div className="hero__stat-label" data-copy-en="Menu Items" data-copy-id="Item Menu">Menu Items</div>
+                <div className="hero__stat-label" data-copy-en="Menu Items" data-copy-id="Item Menu">{lang === 'id' ? 'Item Menu' : 'Menu Items'}</div>
               </div>
               <div style={{ width: 1, background: 'var(--border)' }} />
               <div>
                 <div className="hero__stat-num"><span id="statDays" data-value={7}>7</span></div>
-                <div className="hero__stat-label" data-copy-en="Days / Week" data-copy-id="Hari / Minggu">Days / Week</div>
+                <div className="hero__stat-label" data-copy-en="Days / Week" data-copy-id="Hari / Minggu">{lang === 'id' ? 'Hari / Minggu' : 'Days / Week'}</div>
               </div>
             </div>
           </div>
@@ -178,8 +184,8 @@ export default async function HomePage() {
                 <div style={{ width: 52, height: 52, borderRadius: 14, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', color }}>
                   <LegacyIcon name={icon} size={28} />
                 </div>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: 6 }} data-copy-en={titleEn} data-copy-id={titleId}>{titleEn}</h3>
-                <p style={{ fontSize: '.85rem', color: 'var(--muted)' }} data-copy-en={descEn} data-copy-id={descId}>{descEn}</p>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: 6 }} data-copy-en={titleEn} data-copy-id={titleId}>{lang === 'id' ? titleId : titleEn}</h3>
+                <p style={{ fontSize: '.85rem', color: 'var(--muted)' }} data-copy-en={descEn} data-copy-id={descId}>{lang === 'id' ? descId : descEn}</p>
               </div>
             ))}
           </div>
@@ -190,20 +196,20 @@ export default async function HomePage() {
       <section className="section">
         <div className="container">
             <div className="text-center" style={{ marginBottom: 48 }} data-aos="fade-up">
-              <div className="section-label" data-copy-en="Menu Highlights" data-copy-id="Sorotan Menu">Menu Highlights</div>
-              <h2 className="section-title" data-copy-en="Our Menu" data-copy-id="Menu Kami">Our Menu</h2>
-              <p className="section-desc" style={{ margin: '0 auto' }} data-copy-en="Carefully crafted drinks to match any mood." data-copy-id="Minuman yang diracik dengan hati untuk setiap suasana.">Carefully crafted drinks to match any mood.</p>
+              <div className="section-label" data-copy-en="Menu Highlights" data-copy-id="Sorotan Menu">{lang === 'id' ? 'Sorotan Menu' : 'Menu Highlights'}</div>
+              <h2 className="section-title" data-copy-en="Our Menu" data-copy-id="Menu Kami">{lang === 'id' ? 'Menu Kami' : 'Our Menu'}</h2>
+              <p className="section-desc" style={{ margin: '0 auto' }} data-copy-en="Carefully crafted drinks to match any mood." data-copy-id="Minuman yang diracik dengan hati untuk setiap suasana.">{lang === 'id' ? 'Minuman yang diracik dengan hati untuk setiap suasana.' : 'Carefully crafted drinks to match any mood.'}</p>
             </div>
 
           {menuItems && menuItems.length > 0 ? (
             <FeaturedMenuHighlights items={menuItems} />
           ) : (
             <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--muted)' }}>
-              <p><span data-copy-en="Menu will be available soon." data-copy-id="Menu akan segera tersedia.">Menu will be available soon.</span> <Link href="/order" style={{ color: 'var(--red)' }}>Check full menu →</Link></p>
+              <p><span data-copy-en="Menu will be available soon." data-copy-id="Menu akan segera tersedia.">{lang === 'id' ? 'Menu akan segera tersedia.' : 'Menu will be available soon.'}</span> <Link href="/order" style={{ color: 'var(--red)' }}>{lang === 'id' ? 'Cek menu lengkap →' : 'Check full menu →'}</Link></p>
             </div>
           )}
           <div className="text-center mt-8">
-            <Link href="/menu" className="btn btn--outline"><span data-copy-en="View Full Menu →" data-copy-id="Lihat Semua Menu →">View Full Menu →</span></Link>
+            <Link href="/menu" className="btn btn--outline"><span data-copy-en="View Full Menu →" data-copy-id="Lihat Semua Menu →">{lang === 'id' ? 'Lihat Semua Menu →' : 'View Full Menu →'}</span></Link>
           </div>
         </div>
       </section>
@@ -213,10 +219,10 @@ export default async function HomePage() {
         <div className="container">
           <div className="section-hdr-split">
             <div data-aos="fade-up">
-              <div className="section-label" data-copy-en="Gallery" data-copy-id="Galeri">Gallery</div>
-              <h2 className="section-title" data-copy-en="Inside Cotch" data-copy-id="Di Dalam Cotch">Inside Cotch</h2>
+              <div className="section-label" data-copy-en="Gallery" data-copy-id="Galeri">{lang === 'id' ? 'Galeri' : 'Gallery'}</div>
+              <h2 className="section-title" data-copy-en="Inside Cotch" data-copy-id="Di Dalam Cotch">{lang === 'id' ? 'Di Dalam Cotch' : 'Inside Cotch'}</h2>
             </div>
-            <Link href="/gallery" className="btn btn--ghost btn--sm" data-aos="fade-up"><span data-copy-en="View All Photos →" data-copy-id="Lihat Semua Foto →">View All Photos →</span></Link>
+            <Link href="/gallery" className="btn btn--ghost btn--sm" data-aos="fade-up"><span data-copy-en="View All Photos →" data-copy-id="Lihat Semua Foto →">{lang === 'id' ? 'Lihat Semua Foto →' : 'View All Photos →'}</span></Link>
           </div>
           <GallerySection items={gallery ?? []} />
         </div>
@@ -227,9 +233,9 @@ export default async function HomePage() {
         <section className="section" style={{ background: 'var(--cream-dark)' }}>
           <div className="container">
             <div className="text-center" style={{ marginBottom: 40 }}>
-              <div className="section-label" data-copy-en="Testimonials" data-copy-id="Testimoni">Testimonials</div>
-              <h2 className="section-title" data-copy-en="Loved by Our Guests" data-copy-id="Disukai Tamu Kami">Loved by Our Guests</h2>
-              <p className="section-desc" style={{ margin: '8px auto 0' }} data-copy-en="Real reviews from real visits." data-copy-id="Ulasan asli dari kunjungan nyata.">Real reviews from real visits.</p>
+              <div className="section-label" data-copy-en="Testimonials" data-copy-id="Testimoni">{lang === 'id' ? 'Testimoni' : 'Testimonials'}</div>
+              <h2 className="section-title" data-copy-en="Loved by Our Guests" data-copy-id="Disukai Tamu Kami">{lang === 'id' ? 'Disukai Tamu Kami' : 'Loved by Our Guests'}</h2>
+              <p className="section-desc" style={{ margin: '8px auto 0' }} data-copy-en="Real reviews from real visits." data-copy-id="Ulasan asli dari kunjungan nyata.">{lang === 'id' ? 'Ulasan asli dari kunjungan nyata.' : 'Real reviews from real visits.'}</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 360px))', justifyContent: 'center', gap: 28 }}>
               {reviews.map(review => (
@@ -249,7 +255,7 @@ export default async function HomePage() {
                       </div>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: '.875rem' }}>{review.reviewer_name}</div>
-                        {review.is_verified && <div style={{ fontSize: '.72rem', color: '#16a34a' }} data-copy-en="✓ Verified guest" data-copy-id="✓ Tamu terverifikasi">✓ Verified guest</div>}
+                        {review.is_verified && <div style={{ fontSize: '.72rem', color: '#16a34a' }} data-copy-en="✓ Verified guest" data-copy-id="✓ Tamu terverifikasi">{lang === 'id' ? '✓ Tamu terverifikasi' : '✓ Verified guest'}</div>}
                       </div>
                     </div>
                   </div>
@@ -257,7 +263,7 @@ export default async function HomePage() {
               ))}
             </div>
             <div style={{ textAlign: 'center', marginTop: 32 }}>
-              <Link href="/reviews" className="btn btn--outline"><span data-copy-en="See All Reviews →" data-copy-id="Lihat Semua Ulasan →">See All Reviews →</span></Link>
+              <Link href="/reviews" className="btn btn--outline"><span data-copy-en="See All Reviews →" data-copy-id="Lihat Semua Ulasan →">{lang === 'id' ? 'Lihat Semua Ulasan →' : 'See All Reviews →'}</span></Link>
             </div>
           </div>
         </section>
@@ -268,8 +274,8 @@ export default async function HomePage() {
         <div className="container">
           <div className="grid-map">
             <div className="location-content">
-              <div className="section-label" data-copy-en="Location" data-copy-id="Lokasi">Location</div>
-              <h2 className="section-title" style={{ fontSize: 'clamp(1.6rem,2.5vw,2.2rem)' }} data-copy-en="Find Us in<br>Bandung" data-copy-id="Temukan Kami di<br>Bandung" data-copy-mode="html">Find Us in<br />Bandung</h2>
+              <div className="section-label" data-copy-en="Location" data-copy-id="Lokasi">{lang === 'id' ? 'Lokasi' : 'Location'}</div>
+              <h2 className="section-title" style={{ fontSize: 'clamp(1.6rem,2.5vw,2.2rem)' }} data-copy-en="Find Us in<br>Bandung" data-copy-id="Temukan Kami di<br>Bandung" data-copy-mode="html">{lang === 'id' ? <><span>Temukan Kami di</span><br /><span>Bandung</span></> : <><span>Find Us in</span><br /><span>Bandung</span></>}</h2>
               <div className="location-info">
                 <div className="location-info__row">
                   <span className="location-info__icon">
@@ -285,15 +291,15 @@ export default async function HomePage() {
                     <ClockIcon style={{ width: 22, height: 22, color: 'var(--gold)' }} />
                   </span>
                   <div>
-                    <p className="location-info__hours" data-copy-en={`${site.daysText} · ${site.openTime}–${site.closeTime} WIB`} data-copy-id={`${site.daysTextId} · ${site.openTime}–${site.closeTime} WIB`}>{site.daysText} · {site.openTime}–{site.closeTime} WIB</p>
+                    <p className="location-info__hours" data-copy-en={`${site.daysText} · ${site.openTime}–${site.closeTime} WIB`} data-copy-id={`${site.daysTextId} · ${site.openTime}–${site.closeTime} WIB`}>{lang === 'id' ? site.daysTextId : site.daysText} · {site.openTime}–{site.closeTime} WIB</p>
                   </div>
                 </div>
               </div>
               <div className="location-btns">
                 <a href="https://www.google.com/maps/search/?api=1&query=Cotch+Bandung" target="_blank" rel="noopener noreferrer" className="btn btn--outline btn--sm">
-                  <span data-copy-en="Open in Google Maps" data-copy-id="Buka di Google Maps">Open in Google Maps</span>
+                  <span data-copy-en="Open in Google Maps" data-copy-id="Buka di Google Maps">{lang === 'id' ? 'Buka di Google Maps' : 'Open in Google Maps'}</span>
                 </a>
-                <a href="https://www.google.com/maps/dir/?api=1&destination=Cotch+Bandung" target="_blank" rel="noopener noreferrer" className="btn btn--ghost btn--sm"><span data-copy-en="Get Directions ↗" data-copy-id="Petunjuk Arah ↗">Get Directions ↗</span></a>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=Cotch+Bandung" target="_blank" rel="noopener noreferrer" className="btn btn--ghost btn--sm"><span data-copy-en="Get Directions ↗" data-copy-id="Petunjuk Arah ↗">{lang === 'id' ? 'Petunjuk Arah ↗' : 'Get Directions ↗'}</span></a>
               </div>
             </div>
 
@@ -311,7 +317,7 @@ export default async function HomePage() {
                 rel="noopener noreferrer"
                 style={{ position: 'absolute', bottom: 12, right: 12, background: '#fff', color: 'var(--red)', fontSize: '.75rem', fontWeight: 700, padding: '7px 13px', borderRadius: 18, boxShadow: '0 2px 8px rgba(0,0,0,.15)', display: 'flex', alignItems: 'center', gap: 5 }}
               >
-                <span data-copy-en="Open Maps" data-copy-id="Buka Peta">Open Maps</span>
+                <span data-copy-en="Open Maps" data-copy-id="Buka Peta">{lang === 'id' ? 'Buka Peta' : 'Open Maps'}</span>
               </a>
             </div>
           </div>
@@ -328,13 +334,15 @@ export default async function HomePage() {
               <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, color: 'rgba(255,255,255,.7)' }}>
                 <LegacyIcon name="sparkles" size={36} />
               </span>
-              <h2 style={{ color: '#fff', marginBottom: 14, fontSize: 'clamp(1.6rem,3vw,2.4rem)' }} data-copy-en="Ready for a Great Time?" data-copy-id="Siap untuk Waktu yang Menyenangkan?">Ready for a Great Time?</h2>
+              <h2 style={{ color: '#fff', marginBottom: 14, fontSize: 'clamp(1.6rem,3vw,2.4rem)' }} data-copy-en="Ready for a Great Time?" data-copy-id="Siap untuk Waktu yang Menyenangkan?">{lang === 'id' ? 'Siap untuk Waktu yang Menyenangkan?' : 'Ready for a Great Time?'}</h2>
               <p style={{ color: 'rgba(255,255,255,.8)', maxWidth: 440, margin: '0 auto 32px', fontSize: '.95rem' }} data-copy-en="Reserve your table now or join the waitlist — we'll make sure your visit is unforgettable." data-copy-id="Reservasi mejamu sekarang atau masuk daftar tunggu — kami akan memastikan kunjunganmu tak terlupakan.">
-                Reserve your table now or join the waitlist &mdash; we&apos;ll make sure your visit is unforgettable.
+                {lang === 'id'
+                  ? 'Reservasi mejamu sekarang atau masuk daftar tunggu — kami akan memastikan kunjunganmu tak terlupakan.'
+                  : 'Reserve your table now or join the waitlist — we’ll make sure your visit is unforgettable.'}
               </p>
               <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link href="/booking" className="btn btn--lg" style={{ background: '#fff', color: 'var(--red)', borderColor: '#fff' }}><span data-copy-en="Reserve a Table" data-copy-id="Reservasi Meja">Reserve a Table</span></Link>
-                <Link href="/waitlist" className="btn btn--lg btn--outline" style={{ color: '#fff', borderColor: 'rgba(255,255,255,.5)' }}><span data-copy-en="Join Waitlist" data-copy-id="Masuk Daftar Tunggu">Join Waitlist</span></Link>
+                <Link href="/booking" className="btn btn--lg" style={{ background: '#fff', color: 'var(--red)', borderColor: '#fff' }}><span data-copy-en="Reserve a Table" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Reserve a Table'}</span></Link>
+                <Link href="/waitlist" className="btn btn--lg btn--outline" style={{ color: '#fff', borderColor: 'rgba(255,255,255,.5)' }}><span data-copy-en="Join Waitlist" data-copy-id="Masuk Daftar Tunggu">{lang === 'id' ? 'Masuk Daftar Tunggu' : 'Join Waitlist'}</span></Link>
               </div>
             </div>
           </div>

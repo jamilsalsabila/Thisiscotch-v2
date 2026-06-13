@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { formatRupiah } from '@/utils/format'
 import type { Database } from '@/types/database'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type MenuItem = Database['public']['Tables']['menu_items']['Row']
 
@@ -17,7 +18,7 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
   const [visibleSlides, setVisibleSlides] = useState(3)
   const [page, setPage] = useState(0)
   const [paused, setPaused] = useState(false)
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -25,26 +26,6 @@ export default function FeaturedMenuHighlights({ items }: { items: MenuItem[] })
     sync()
     window.addEventListener('resize', sync)
     return () => window.removeEventListener('resize', sync)
-  }, [])
-
-  useEffect(() => {
-    const applyLang = (value?: string) => {
-      setLang(value === 'id' ? 'id' : 'en')
-    }
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
   }, [])
 
   const maxPage = useMemo(

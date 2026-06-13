@@ -14,15 +14,14 @@ const NAV_ITEMS = [
   { href: '/admin/gallery', slug: 'gallery', label: 'Gallery', icon: 'photo' as const },
   { href: '/admin/settings', slug: 'settings', label: 'Settings', icon: 'cog' as const },
   { href: '/admin/bookings', slug: 'bookings', label: 'Bookings', icon: 'clipboard-list' as const },
-  { href: '/admin/reviews', slug: 'reviews', label: 'Reviews', icon: 'star' as const },
 ]
 
 function pageTitle(pathname: string) {
   if (pathname === '/admin') return 'Dashboard'
   if (pathname.startsWith('/admin/bookings')) return 'Bookings, Orders & Waitlist'
-  if (pathname.startsWith('/admin/menu')) return 'Menu'
-  if (pathname.startsWith('/admin/categories')) return 'Categories'
-  if (pathname.startsWith('/admin/schedule')) return 'Schedule'
+  if (pathname.startsWith('/admin/menu')) return 'Menu Management'
+  if (pathname.startsWith('/admin/categories')) return 'Categories & Subcategories'
+  if (pathname.startsWith('/admin/schedule')) return 'Operating Schedule'
   if (pathname.startsWith('/admin/gallery')) return 'Gallery'
   if (pathname.startsWith('/admin/settings')) return 'General Settings'
   if (pathname.startsWith('/admin/reviews')) return 'Customer Reviews'
@@ -74,11 +73,6 @@ export default function AdminShell({
                   <span className="icon"><LegacyIcon name={item.icon} size={18} /></span>
                   {item.label}
                 </span>
-                {item.slug === 'bookings' && unseenBookings > 0 && (
-                  <span style={{ background: '#C41230', color: '#fff', fontSize: '.7rem', fontWeight: 700, padding: '2px 7px', borderRadius: 999, lineHeight: 1.4 }}>
-                    {unseenBookings}
-                  </span>
-                )}
               </Link>
             )
           })}
@@ -86,7 +80,7 @@ export default function AdminShell({
           <div className="nav-section" style={{ marginTop: 12 }}>Site</div>
           <a href="/" target="_blank" rel="noreferrer">
             <span className="icon"><LegacyIcon name="globe" size={18} /></span>
-            View Site ↗
+            View Website
           </a>
         </nav>
 

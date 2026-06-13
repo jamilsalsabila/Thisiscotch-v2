@@ -7,6 +7,7 @@ import { formatDateDisplay } from '@/utils/format'
 import type { Database } from '@/types/database'
 import LegacyIcon from '@/components/ui/LegacyIcon'
 import { WordmarkLogo } from '@/components/ui/BrandLogo'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type FloorTable = Database['public']['Tables']['floor_tables']['Row']
 type Section = 'indoor' | 'semi-outdoor-1' | 'semi-outdoor-2'
@@ -111,7 +112,7 @@ type BookingResult = { bookingCode: string; tableId: string; tableLabel: string;
 interface Props { tables: FloorTable[] }
 
 export default function BookingClient({ tables }: Props) {
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const [activeSection, setSection]     = useState<Section>('indoor')
   const [selectedDate, setDate]         = useState(TODAY)
   const [selectedTime, setTime]         = useState('12:00')
@@ -123,24 +124,6 @@ export default function BookingClient({ tables }: Props) {
   const [cancelingResult, setCancelingResult] = useState(false)
   const [error, setError]               = useState('')
   const [form, setForm] = useState({ name: '', phone: '', email: '', partySize: '2', specialRequest: '' })
-
-  useEffect(() => {
-    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
-
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
 
   const fetchAvailability = useCallback(async (date: string, time: string) => {
     setLoadingAvail(true)
@@ -226,12 +209,12 @@ export default function BookingClient({ tables }: Props) {
       {/* Date & Time bar */}
       <div className="booking-datetime-row" style={{ background: 'var(--cream-dark)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '20px 24px', marginBottom: 32, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ flex: 1, minWidth: 150, maxWidth: 260 }}>
-          <label className="form-label" data-copy-en="Date" data-copy-id="Tanggal">Date</label>
+          <label className="form-label" data-copy-en="Date" data-copy-id="Tanggal">{lang === 'id' ? 'Tanggal' : 'Date'}</label>
           <input className="form-input" type="date" value={selectedDate} min={TODAY}
             onChange={e => handleDateChange(e.target.value)} />
         </div>
         <div style={{ flex: 1, minWidth: 140, maxWidth: 220 }}>
-          <label className="form-label" data-copy-en="Time" data-copy-id="Waktu">Time</label>
+          <label className="form-label" data-copy-en="Time" data-copy-id="Waktu">{lang === 'id' ? 'Waktu' : 'Time'}</label>
           <select className="form-select" value={selectedTime} onChange={e => handleTimeChange(e.target.value)}>
             {TIME_SLOTS.map(t => <option key={t} value={t}>{t} WIB</option>)}
           </select>
@@ -240,10 +223,10 @@ export default function BookingClient({ tables }: Props) {
           <div style={{ fontSize: '.82rem', color: 'var(--muted)', paddingBottom: 10 }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: 'var(--gold)' }}>
               <LegacyIcon name="bolt" size={15} />
-              <span data-copy-en="Select a table on the floor plan" data-copy-id="Pilih meja pada denah lantai">Select a table on the floor plan</span>
+              <span data-copy-en="Select a table on the floor plan" data-copy-id="Pilih meja pada denah lantai">{lang === 'id' ? 'Pilih meja pada denah lantai' : 'Select a table on the floor plan'}</span>
             </span>
           </div>
-          {loadingAvail && <div style={{ color: 'var(--muted)', fontSize: '.8rem' }} data-copy-en="Loading availability…" data-copy-id="Memuat ketersediaan…">Loading availability…</div>}
+          {loadingAvail && <div style={{ color: 'var(--muted)', fontSize: '.8rem' }} data-copy-en="Loading availability…" data-copy-id="Memuat ketersediaan…">{lang === 'id' ? 'Memuat ketersediaan…' : 'Loading availability…'}</div>}
         </div>
       </div>
 
@@ -316,53 +299,53 @@ export default function BookingClient({ tables }: Props) {
             {selectedTableId && selectedDef
               ? (
                 <>
-                  <span data-copy-en="Selected table:" data-copy-id="Meja terpilih:">Selected table:</span> <strong>{SECTION_LABELS[activeSection][lang]} — {getDisplayLabel(selectedDef)}</strong>
+                  <span data-copy-en="Selected table:" data-copy-id="Meja terpilih:">{lang === 'id' ? 'Meja terpilih:' : 'Selected table:'}</span> <strong>{SECTION_LABELS[activeSection][lang]} — {getDisplayLabel(selectedDef)}</strong>
                   {' · '}{selectedDef.cap} pax{' · '}{formatDateDisplay(selectedDate)} · {selectedTime}
                 </>
               )
-              : <span data-copy-en="Select a table above" data-copy-id="Pilih meja di atas">Select a table above</span>}
+              : <span data-copy-en="Select a table above" data-copy-id="Pilih meja di atas">{lang === 'id' ? 'Pilih meja di atas' : 'Select a table above'}</span>}
           </div>
 
           <div style={{ marginTop: 16, padding: '14px 18px', background: 'rgba(212,148,26,.08)', borderRadius: 'var(--radius-sm)', fontSize: '.82rem', color: 'var(--muted)' }}>
-            <span data-copy-en="All tables booked?" data-copy-id="Semua meja sudah dipesan?">All tables booked?</span> <a href="/waitlist" style={{ color: 'var(--gold)', fontWeight: 600 }} data-copy-en="Join the waitlist →" data-copy-id="Masuk daftar tunggu →">Join the waitlist →</a>
+            <span data-copy-en="All tables booked?" data-copy-id="Semua meja sudah dipesan?">{lang === 'id' ? 'Semua meja sudah dipesan?' : 'All tables booked?'}</span> <a href="/waitlist" style={{ color: 'var(--gold)', fontWeight: 600 }} data-copy-en="Join the waitlist →" data-copy-id="Masuk daftar tunggu →">{lang === 'id' ? 'Masuk daftar tunggu →' : 'Join the waitlist →'}</a>
           </div>
         </div>
 
         {/* Booking form */}
         <div>
           <form className="booking-form" onSubmit={handleSubmit}>
-            <h3 style={{ marginBottom: 20, fontSize: '1.2rem' }} data-copy-en="Your Details" data-copy-id="Detail Anda">Your Details</h3>
+            <h3 style={{ marginBottom: 20, fontSize: '1.2rem' }} data-copy-en="Your Details" data-copy-id="Detail Anda">{lang === 'id' ? 'Detail Anda' : 'Your Details'}</h3>
 
             <div className="form-group">
-              <label className="form-label" data-copy-en="Full Name" data-copy-id="Nama Lengkap">Full Name</label>
+              <label className="form-label" data-copy-en="Full Name" data-copy-id="Nama Lengkap">{lang === 'id' ? 'Nama Lengkap' : 'Full Name'}</label>
               <input className="form-input" required value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Your name" data-placeholder-en="Your name" data-placeholder-id="Nama Anda" />
             </div>
             <div className="form-group">
-              <label className="form-label" data-copy-en="WhatsApp Number" data-copy-id="Nomor WhatsApp">WhatsApp Number</label>
+              <label className="form-label" data-copy-en="WhatsApp Number" data-copy-id="Nomor WhatsApp">{lang === 'id' ? 'Nomor WhatsApp' : 'WhatsApp Number'}</label>
               <input className="form-input" required type="tel" value={form.phone}
                 onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+62..." />
             </div>
             <div className="form-group">
-              <label className="form-label" data-copy-en="Email (optional)" data-copy-id="Email (opsional)">Email (optional)</label>
+              <label className="form-label" data-copy-en="Email (optional)" data-copy-id="Email (opsional)">{lang === 'id' ? 'Email (opsional)' : 'Email (optional)'}</label>
               <input className="form-input" type="email" value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 placeholder="your@email.com" data-placeholder-en="your@email.com" data-placeholder-id="email@anda.com" />
             </div>
             <div className="form-group">
-              <label className="form-label" data-copy-en="Party Size" data-copy-id="Jumlah Tamu">Party Size</label>
+              <label className="form-label" data-copy-en="Party Size" data-copy-id="Jumlah Tamu">{lang === 'id' ? 'Jumlah Tamu' : 'Party Size'}</label>
               <select className="form-select" value={form.partySize}
                 onChange={e => setForm(f => ({ ...f, partySize: e.target.value }))}>
                   {Array.from({ length: selectedDef?.cap ?? 6 }, (_, i) => i + 1).map(n => (
                     <option key={n} value={n}>{n} pax</option>
                   ))}
               </select>
-              <p className="form-hint" data-copy-en="Max capacity depends on selected table." data-copy-id="Kapasitas maksimal tergantung meja yang dipilih.">Max capacity depends on selected table.</p>
+              <p className="form-hint" data-copy-en="Max capacity depends on selected table." data-copy-id="Kapasitas maksimal tergantung meja yang dipilih.">{lang === 'id' ? 'Kapasitas maksimal tergantung meja yang dipilih.' : 'Max capacity depends on selected table.'}</p>
             </div>
             <div className="form-group">
-              <label className="form-label" data-copy-en="Special Request" data-copy-id="Permintaan Khusus">Special Request</label>
+              <label className="form-label" data-copy-en="Special Request" data-copy-id="Permintaan Khusus">{lang === 'id' ? 'Permintaan Khusus' : 'Special Request'}</label>
               <textarea className="form-textarea" value={form.specialRequest}
                 onChange={e => setForm(f => ({ ...f, specialRequest: e.target.value }))}
                 placeholder="e.g. birthday setup, wheelchair access..." data-placeholder-en="e.g. birthday setup, wheelchair access..." data-placeholder-id="mis. dekor ulang tahun, akses kursi roda..." />
@@ -377,11 +360,11 @@ export default function BookingClient({ tables }: Props) {
             <button type="submit" className={`btn btn--primary w-full${submitting ? ' btn--loading' : ''}`}
               style={{ justifyContent: 'center' }}
               disabled={submitting || !selectedTableId}>
-              {submitting ? '' : <span data-copy-en="Confirm Reservation" data-copy-id="Konfirmasi Reservasi">Confirm Reservation</span>}
+              {submitting ? '' : <span data-copy-en="Confirm Reservation" data-copy-id="Konfirmasi Reservasi">{lang === 'id' ? 'Konfirmasi Reservasi' : 'Confirm Reservation'}</span>}
             </button>
           </form>
           <p style={{ fontSize: '.75rem', color: 'var(--muted)', marginTop: 14, textAlign: 'center' }}>
-            <span data-copy-en="Need to cancel? Use the code on your ticket at any time." data-copy-id="Perlu membatalkan? Gunakan kode pada tiket Anda kapan saja.">Need to cancel? Use the code on your ticket at any time.</span>
+            <span data-copy-en="Need to cancel? Use the code on your ticket at any time." data-copy-id="Perlu membatalkan? Gunakan kode pada tiket Anda kapan saja.">{lang === 'id' ? 'Perlu membatalkan? Gunakan kode pada tiket Anda kapan saja.' : 'Need to cancel? Use the code on your ticket at any time.'}</span>
           </p>
         </div>
       </div>
@@ -393,7 +376,7 @@ export default function BookingClient({ tables }: Props) {
             <div className="ticket">
               <div className="ticket__header">
                 <WordmarkLogo />
-                <div className="ticket__type" data-copy-en="Table Reservation" data-copy-id="Reservasi Meja">Table Reservation</div>
+                <div className="ticket__type" data-copy-en="Table Reservation" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Table Reservation'}</div>
                 <div className="ticket__code">{result.bookingCode}</div>
               </div>
               <div className="ticket__body">
@@ -413,17 +396,17 @@ export default function BookingClient({ tables }: Props) {
                 <div className="ticket__row">
                   <span className="ticket__key" data-copy-en="Status" data-copy-id="Status">Status</span>
                   <span className="ticket__val">
-                    <span className="ticket__status active" data-copy-en="● Active" data-copy-id="● Aktif">● Active</span>
+                    <span className="ticket__status active" data-copy-en="● Active" data-copy-id="● Aktif">{lang === 'id' ? '● Aktif' : '● Active'}</span>
                   </span>
                 </div>
               </div>
               <div className="ticket__footer">
-                <p data-copy-en="Show this ticket to our staff upon arrival." data-copy-id="Tunjukkan tiket ini kepada staf kami saat tiba.">Show this ticket to our staff upon arrival.</p>
-                <p style={{ marginTop: 4, fontSize: '.7rem' }} data-copy-en="Please arrive within 15 minutes of your reserved time." data-copy-id="Mohon datang dalam waktu 15 menit dari jam reservasi Anda.">Please arrive within 15 minutes of your reserved time.</p>
+                <p data-copy-en="Show this ticket to our staff upon arrival." data-copy-id="Tunjukkan tiket ini kepada staf kami saat tiba.">{lang === 'id' ? 'Tunjukkan tiket ini kepada staf kami saat tiba.' : 'Show this ticket to our staff upon arrival.'}</p>
+                <p style={{ marginTop: 4, fontSize: '.7rem' }} data-copy-en="Please arrive within 15 minutes of your reserved time." data-copy-id="Mohon datang dalam waktu 15 menit dari jam reservasi Anda.">{lang === 'id' ? 'Mohon datang dalam waktu 15 menit dari jam reservasi Anda.' : 'Please arrive within 15 minutes of your reserved time.'}</p>
                 <div style={{ display: 'flex', gap: 10, marginTop: 14, justifyContent: 'center' }}>
-                  <button className="btn btn--ghost btn--sm" onClick={resetForm}><span data-copy-en="Close" data-copy-id="Tutup">Close</span></button>
+                  <button className="btn btn--ghost btn--sm" onClick={resetForm}><span data-copy-en="Close" data-copy-id="Tutup">{lang === 'id' ? 'Tutup' : 'Close'}</span></button>
                   <button className={`btn btn--danger btn--sm${cancelingResult ? ' btn--loading' : ''}`} onClick={() => void handleCancelFromTicket()} disabled={cancelingResult}>
-                    {cancelingResult ? '' : <span data-copy-en="Cancel Booking" data-copy-id="Batalkan Booking">Cancel Booking</span>}
+                    {cancelingResult ? '' : <span data-copy-en="Cancel Booking" data-copy-id="Batalkan Booking">{lang === 'id' ? 'Batalkan Booking' : 'Cancel Booking'}</span>}
                   </button>
                 </div>
               </div>

@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createOrder } from '@/app/(public)/order/actions'
 import { cancelRecord, lookupRecord } from '@/app/(public)/lookup/actions'
 import { formatRupiah } from '@/utils/format'
 import type { MenuItem, MenuLabels } from '@/lib/menu'
 import { WordmarkLogo } from '@/components/ui/BrandLogo'
+import { usePublicLanguage } from '@/components/layout/PublicLanguageProvider'
 
 type CartItem = { id: number; nameEn: string; nameId: string; price: number; quantity: number }
 type OrderLookup =
@@ -31,7 +32,7 @@ function statusColor(status: string) {
 
 export default function OrderClient({ categories, grouped, labels, isOpen }: Props) {
   const [activeTab, setTab] = useState('all')
-  const [lang, setLang] = useState<'en' | 'id'>('en')
+  const lang = usePublicLanguage()
   const [cart, setCart] = useState<CartItem[]>([])
   const [submitting, setSub] = useState(false)
   const [orderCode, setCode] = useState('')
@@ -44,23 +45,6 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
 
   const allTabs = useMemo(() => ['all', ...categories], [categories])
   const totalAmt = cart.reduce((sum, item) => sum + item.quantity * item.price, 0)
-
-  useEffect(() => {
-    const applyLang = (value?: string) => setLang(value === 'id' ? 'id' : 'en')
-    applyLang(localStorage.getItem('cotch_lang') || 'en')
-
-    const onLangChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ lang?: string } | string>).detail
-      if (typeof detail === 'string') {
-        applyLang(detail)
-        return
-      }
-      applyLang(detail?.lang || localStorage.getItem('cotch_lang') || 'en')
-    }
-
-    document.addEventListener('langChanged', onLangChanged)
-    return () => document.removeEventListener('langChanged', onLangChanged)
-  }, [])
 
   function addToCart(item: MenuItem) {
     setCart(current => {
@@ -155,7 +139,7 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
               <div className="menu-card__img">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={getItemImage(item)} alt={lang === 'id' ? (item.name_id || item.name_en) : item.name_en} loading="lazy" />
-                {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">Featured</span> : null}
+                {item.is_featured ? <span className="menu-card__badge-featured" data-copy-en="Featured" data-copy-id="Unggulan">{lang === 'id' ? 'Unggulan' : 'Featured'}</span> : null}
               </div>
               <div className="menu-card__body">
                 <div className="menu-card__sub">
@@ -198,8 +182,8 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
   if (categories.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--muted)' }}>
-        <p style={{ fontWeight: 600, marginBottom: 8 }} data-copy-en="Menu is not available yet" data-copy-id="Menu belum tersedia">Menu is not available yet</p>
-        <p style={{ fontSize: '.875rem' }} data-copy-en="Add menu items in Supabase to start receiving orders." data-copy-id="Tambahkan item menu di Supabase untuk mulai menerima order.">Add menu items in Supabase to start receiving orders.</p>
+        <p style={{ fontWeight: 600, marginBottom: 8 }} data-copy-en="Menu is not available yet" data-copy-id="Menu belum tersedia">{lang === 'id' ? 'Menu belum tersedia' : 'Menu is not available yet'}</p>
+        <p style={{ fontSize: '.875rem' }} data-copy-en="Add menu items in Supabase to start receiving orders." data-copy-id="Tambahkan item menu di Supabase untuk mulai menerima order.">{lang === 'id' ? 'Tambahkan item menu di Supabase untuk mulai menerima order.' : 'Add menu items in Supabase to start receiving orders.'}</p>
       </div>
     )
   }
@@ -281,10 +265,10 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
         </div>
 
         <div className="cart-sidebar">
-          <h3 style={{ marginBottom: 16, fontSize: '1.1rem' }} data-copy-en="Your Order" data-copy-id="Pesanan Anda">Your Order</h3>
+          <h3 style={{ marginBottom: 16, fontSize: '1.1rem' }} data-copy-en="Your Order" data-copy-id="Pesanan Anda">{lang === 'id' ? 'Pesanan Anda' : 'Your Order'}</h3>
 
           {cart.length === 0 ? (
-            <div className="cart-empty" data-copy-en="Your order is empty." data-copy-id="Pesanan Anda masih kosong.">Your order is empty.</div>
+            <div className="cart-empty" data-copy-en="Your order is empty." data-copy-id="Pesanan Anda masih kosong.">{lang === 'id' ? 'Pesanan Anda masih kosong.' : 'Your order is empty.'}</div>
           ) : (
             <>
               <div id="cartItems">
@@ -315,19 +299,19 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
 
                 <form onSubmit={handleSubmit}>
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="Your Name" data-copy-id="Nama Anda">Your Name</label>
+                    <label className="form-label" data-copy-en="Your Name" data-copy-id="Nama Anda">{lang === 'id' ? 'Nama Anda' : 'Your Name'}</label>
                     <input className="form-input" required value={form.name} onChange={setField('name')} placeholder={lang === 'id' ? 'Nama' : 'Name'} data-placeholder-en="Name" data-placeholder-id="Nama" />
                   </div>
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="WhatsApp Number" data-copy-id="Nomor WhatsApp">WhatsApp Number</label>
+                    <label className="form-label" data-copy-en="WhatsApp Number" data-copy-id="Nomor WhatsApp">{lang === 'id' ? 'Nomor WhatsApp' : 'WhatsApp Number'}</label>
                     <input className="form-input" required type="tel" value={form.phone} onChange={setField('phone')} placeholder="+62..." />
                   </div>
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="Table Number (optional)" data-copy-id="Nomor Meja (opsional)">Table Number (optional)</label>
+                    <label className="form-label" data-copy-en="Table Number (optional)" data-copy-id="Nomor Meja (opsional)">{lang === 'id' ? 'Nomor Meja (opsional)' : 'Table Number (optional)'}</label>
                     <input className="form-input" value={form.tableNumber} onChange={setField('tableNumber')} placeholder={lang === 'id' ? 'mis. T3 atau O1' : 'e.g. T3 or O1'} data-placeholder-en="e.g. T3 or O1" data-placeholder-id="mis. T3 atau O1" />
                   </div>
                   <div className="form-group">
-                    <label className="form-label" data-copy-en="Notes" data-copy-id="Catatan">Notes</label>
+                    <label className="form-label" data-copy-en="Notes" data-copy-id="Catatan">{lang === 'id' ? 'Catatan' : 'Notes'}</label>
                     <textarea className="form-textarea" style={{ minHeight: 70 }} value={form.notes} onChange={setField('notes')} placeholder={lang === 'id' ? 'mis. less sugar, oat milk...' : 'e.g. less sugar, oat milk...'} data-placeholder-en="e.g. less sugar, oat milk..." data-placeholder-id="mis. less sugar, oat milk..." />
                   </div>
 
@@ -349,8 +333,8 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
 
       <div style={{ marginTop: 48 }}>
         <div className="lookup-box">
-          <h3 style={{ marginBottom: 8 }} data-copy-en="Track My Order" data-copy-id="Lacak Pesanan Saya">Track My Order</h3>
-          <p style={{ fontSize: '.85rem', color: 'var(--muted)', marginBottom: 14 }} data-copy-en="Enter your order code to check status." data-copy-id="Masukkan kode order Anda untuk cek status.">Enter your order code to check status.</p>
+          <h3 style={{ marginBottom: 8 }} data-copy-en="Track My Order" data-copy-id="Lacak Pesanan Saya">{lang === 'id' ? 'Lacak Pesanan Saya' : 'Track My Order'}</h3>
+          <p style={{ fontSize: '.85rem', color: 'var(--muted)', marginBottom: 14 }} data-copy-en="Enter your order code to check status." data-copy-id="Masukkan kode order Anda untuk cek status.">{lang === 'id' ? 'Masukkan kode order Anda untuk cek status.' : 'Enter your order code to check status.'}</p>
           <div className="lookup-actions-row" style={{ display: 'flex', gap: 10 }}>
             <input
               type="text"
@@ -414,16 +398,16 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
             <div className="ticket">
               <div className="ticket__header" style={{ background: '#1a1a1a' }}>
                 <WordmarkLogo />
-                <div className="ticket__type" data-copy-en="Order Confirmation" data-copy-id="Konfirmasi Order">Order Confirmation</div>
+                <div className="ticket__type" data-copy-en="Order Confirmation" data-copy-id="Konfirmasi Order">{lang === 'id' ? 'Konfirmasi Order' : 'Order Confirmation'}</div>
                 <div className="ticket__code">{orderCode}</div>
               </div>
               <div className="ticket__body">
                 <div className="ticket__row">
-                  <span className="ticket__key" data-copy-en="Name" data-copy-id="Nama">Name</span>
+                  <span className="ticket__key" data-copy-en="Name" data-copy-id="Nama">{lang === 'id' ? 'Nama' : 'Name'}</span>
                   <span className="ticket__val">{form.name}</span>
                 </div>
                 <div className="ticket__row">
-                  <span className="ticket__key" data-copy-en="Table" data-copy-id="Meja">Table</span>
+                  <span className="ticket__key" data-copy-en="Table" data-copy-id="Meja">{lang === 'id' ? 'Meja' : 'Table'}</span>
                   <span className="ticket__val">{form.tableNumber || '—'}</span>
                 </div>
                 <div style={{ padding: '8px 0', borderBottom: '1px dashed var(--border)' }}>
@@ -441,14 +425,14 @@ export default function OrderClient({ categories, grouped, labels, isOpen }: Pro
                 <div className="ticket__row">
                   <span className="ticket__key" data-copy-en="Status" data-copy-id="Status">Status</span>
                   <span className="ticket__val">
-                    <span className="ticket__status active" data-copy-en="● Pending" data-copy-id="● Menunggu">● Pending</span>
+                    <span className="ticket__status active" data-copy-en="● Pending" data-copy-id="● Menunggu">{lang === 'id' ? '● Menunggu' : '● Pending'}</span>
                   </span>
                 </div>
               </div>
               <div className="ticket__footer">
-                <p data-copy-en="Your order has been received. Show this to our staff." data-copy-id="Order Anda sudah kami terima. Tunjukkan ini kepada staf kami.">Your order has been received. Show this to our staff.</p>
+                <p data-copy-en="Your order has been received. Show this to our staff." data-copy-id="Order Anda sudah kami terima. Tunjukkan ini kepada staf kami.">{lang === 'id' ? 'Order Anda sudah kami terima. Tunjukkan ini kepada staf kami.' : 'Your order has been received. Show this to our staff.'}</p>
                 <div className="ticket-actions-row" style={{ display: 'flex', gap: 10, marginTop: 14, justifyContent: 'center' }}>
-                  <button type="button" className="btn btn--ghost btn--sm" onClick={resetOrder}><span data-copy-en="Close" data-copy-id="Tutup">Close</span></button>
+                  <button type="button" className="btn btn--ghost btn--sm" onClick={resetOrder}><span data-copy-en="Close" data-copy-id="Tutup">{lang === 'id' ? 'Tutup' : 'Close'}</span></button>
                   <button type="button" className={`btn btn--danger btn--sm${cancelingTicket ? ' btn--loading' : ''}`} onClick={() => void handleCancelTicket()} disabled={cancelingTicket}>
                     {cancelingTicket ? '' : (lang === 'id' ? 'Batalkan Pesanan' : 'Cancel Order')}
                   </button>

@@ -3,6 +3,7 @@ import { unstable_cache } from 'next/cache'
 import { createAdminClient, hasAdminSupabaseEnv } from '@/lib/supabase/server'
 import BookingClient from '@/components/booking/BookingClient'
 import LookupClient from '@/components/lookup/LookupClient'
+import { getPublicLang } from '@/lib/server-lang'
 
 export const metadata: Metadata = { title: 'Reserve a Table' }
 export const dynamic = 'force-dynamic'
@@ -22,14 +23,15 @@ const getFloorTables = unstable_cache(
 )
 
 export default async function BookingPage() {
+  const lang = await getPublicLang()
   const tables = await getFloorTables()
   return (
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Table Reservation" data-copy-id="Reservasi Meja">Table Reservation</div>
-          <h1 data-copy-en="Reserve Your Table" data-copy-id="Reservasi Meja">Reserve Your Table</h1>
-          <p data-copy-en="Pick a table, choose your time, get your ticket." data-copy-id="Pilih meja, tentukan waktu, dan dapatkan tiketmu.">Pick a table, choose your time, get your ticket.</p>
+          <div className="section-label" data-copy-en="Table Reservation" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Table Reservation'}</div>
+          <h1 data-copy-en="Reserve Your Table" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Reserve Your Table'}</h1>
+          <p data-copy-en="Pick a table, choose your time, get your ticket." data-copy-id="Pilih meja, tentukan waktu, dan dapatkan tiketmu.">{lang === 'id' ? 'Pilih meja, tentukan waktu, dan dapatkan tiketmu.' : 'Pick a table, choose your time, get your ticket.'}</p>
         </div>
       </div>
       <section className="section">
@@ -38,8 +40,8 @@ export default async function BookingPage() {
 
           <div style={{ marginTop: 48 }}>
             <div className="lookup-box">
-              <h3 data-copy-en="Find My Booking" data-copy-id="Cari Booking Saya">Find My Booking</h3>
-              <p style={{ fontSize: '.85rem', color: 'var(--muted)', marginBottom: 16 }} data-copy-en="Enter your booking code to view or cancel." data-copy-id="Masukkan kode booking Anda untuk melihat atau membatalkan.">Enter your booking code to view or cancel.</p>
+              <h3 data-copy-en="Find My Booking" data-copy-id="Cari Booking Saya">{lang === 'id' ? 'Cari Booking Saya' : 'Find My Booking'}</h3>
+              <p style={{ fontSize: '.85rem', color: 'var(--muted)', marginBottom: 16 }} data-copy-en="Enter your booking code to view or cancel." data-copy-id="Masukkan kode booking Anda untuk melihat atau membatalkan.">{lang === 'id' ? 'Masukkan kode booking Anda untuk melihat atau membatalkan.' : 'Enter your booking code to view or cancel.'}</p>
               <div style={{ maxWidth: 640 }}>
                 <LookupClient embedded />
               </div>
