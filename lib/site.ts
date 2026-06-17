@@ -62,6 +62,7 @@ export const DEFAULT_MENU_CATEGORIES: Record<string, MenuCategory> = {
 
 export type SiteData = typeof DEFAULT_SITE & {
   isOpen: boolean
+  activeDays: number
   socialWhatsapp: string
   visitorCount: number
   menuCategories: Record<string, MenuCategory>
@@ -121,6 +122,18 @@ function computeOpenState(settings: Map<string, string>) {
   return !closedDays.includes(isoDay) && time >= openTime && time < closeTime
 }
 
+function computeActiveDays(settings: Map<string, string>) {
+  const schedule = safeJson<DailySchedule>(settings.get('daily_schedule'), {})
+  const scheduleKeys = Object.keys(schedule)
+
+  if (scheduleKeys.length > 0) {
+    return scheduleKeys.reduce((sum, key) => sum + (schedule[key]?.is_open === false ? 0 : 1), 0)
+  }
+
+  const closedDays = safeJson<number[]>(settings.get('closed_days'), DEFAULT_SITE.closedDays)
+  return Math.max(0, 7 - closedDays.length)
+}
+
 export const getSiteData = unstable_cache(
   async (): Promise<SiteData> => {
     try {
@@ -128,6 +141,7 @@ export const getSiteData = unstable_cache(
         return {
           ...DEFAULT_SITE,
           isOpen: true,
+          activeDays: 7,
           socialWhatsapp: `https://wa.me/${DEFAULT_SITE.whatsappNumber}`,
           visitorCount: 0,
           menuCategories: DEFAULT_MENU_CATEGORIES,
@@ -166,6 +180,7 @@ export const getSiteData = unstable_cache(
         heroImgMain: settings.get('hero_img_main') ?? DEFAULT_SITE.heroImgMain,
         heroImgFloat: settings.get('hero_img_float') ?? DEFAULT_SITE.heroImgFloat,
         isOpen: computeOpenState(settings),
+        activeDays: computeActiveDays(settings),
         socialWhatsapp: `https://wa.me/${settings.get('whatsapp_number') ?? DEFAULT_SITE.whatsappNumber}`,
         visitorCount,
         menuCategories,
@@ -174,6 +189,7 @@ export const getSiteData = unstable_cache(
       return {
         ...DEFAULT_SITE,
         isOpen: true,
+        activeDays: 7,
         socialWhatsapp: `https://wa.me/${DEFAULT_SITE.whatsappNumber}`,
         visitorCount: 0,
         menuCategories: DEFAULT_MENU_CATEGORIES,

@@ -35,12 +35,14 @@ const getHomeData = unstable_cache(
 
     const supabase = createAdminClient()
     const [
-      { data: menuItems, count: totalMenuItems },
+      { data: menuItems },
+      { count: totalMenuItems },
       { data: gallery },
       { data: reviews },
       { count: totalTables },
     ] = await Promise.all([
       (supabase.from('menu_items').select('*', { count: 'exact' }).eq('is_featured', true).eq('is_available', true).order('sort_order') as any),
+      (supabase.from('menu_items').select('*', { count: 'exact', head: true }) as any),
       (supabase.from('gallery_items').select('*').eq('is_active', true).order('sort_order').limit(8) as any),
       (supabase.from('reviews').select('*').eq('is_published', true).order('created_at', { ascending: false }).limit(3) as any),
       (supabase.from('floor_tables').select('*', { count: 'exact', head: true }).eq('is_active', true) as any),
@@ -129,17 +131,17 @@ export default async function HomePage() {
 
             <div className="hero__stats" data-aos="fade-up" data-aos-delay="300">
               <div>
-                <div className="hero__stat-num"><span id="statTables" data-value={totalTables}>{totalTables}</span>+</div>
+                <div className="hero__stat-num"><span id="statTables" data-value={totalTables}>{totalTables}</span></div>
                 <div className="hero__stat-label" data-copy-en="Tables" data-copy-id="Meja">{lang === 'id' ? 'Meja' : 'Tables'}</div>
               </div>
               <div style={{ width: 1, background: 'var(--border)' }} />
               <div>
-                <div className="hero__stat-num"><span id="statMenu" data-value={totalMenuItems}>{totalMenuItems}</span>+</div>
+                <div className="hero__stat-num"><span id="statMenu" data-value={totalMenuItems}>{totalMenuItems}</span></div>
                 <div className="hero__stat-label" data-copy-en="Menu Items" data-copy-id="Item Menu">{lang === 'id' ? 'Item Menu' : 'Menu Items'}</div>
               </div>
               <div style={{ width: 1, background: 'var(--border)' }} />
               <div>
-                <div className="hero__stat-num"><span id="statDays" data-value={7}>7</span></div>
+                <div className="hero__stat-num"><span id="statDays" data-value={site.activeDays}>{site.activeDays}</span></div>
                 <div className="hero__stat-label" data-copy-en="Days / Week" data-copy-id="Hari / Minggu">{lang === 'id' ? 'Hari / Minggu' : 'Days / Week'}</div>
               </div>
             </div>
