@@ -15,6 +15,32 @@ import {
 
 export const dynamic = 'force-dynamic'
 
+type WeatherSnapshot = {
+  temp: number
+  icon: string
+  descEn: string
+  descId: string
+}
+
+type WeatherDisplay = Omit<WeatherSnapshot, 'temp'>
+
+function mapWeather(code: number): WeatherDisplay {
+  const weatherMap = [
+    { max: 0, icon: '☀️', descEn: 'Clear', descId: 'Cerah' },
+    { max: 1, icon: '🌤️', descEn: 'Mostly Clear', descId: 'Sebagian Cerah' },
+    { max: 2, icon: '⛅', descEn: 'Partly Cloudy', descId: 'Berawan Sebagian' },
+    { max: 3, icon: '☁️', descEn: 'Overcast', descId: 'Mendung' },
+    { max: 48, icon: '🌫️', descEn: 'Foggy', descId: 'Berkabut' },
+    { max: 55, icon: '🌦️', descEn: 'Drizzle', descId: 'Gerimis' },
+    { max: 65, icon: '🌧️', descEn: 'Rainy', descId: 'Hujan' },
+    { max: 75, icon: '🌨️', descEn: 'Snowy', descId: 'Bersalju' },
+    { max: 82, icon: '🌦️', descEn: 'Showers', descId: 'Hujan Ringan' },
+    { max: 99, icon: '⛈️', descEn: 'Thunderstorm', descId: 'Badai Petir' },
+  ]
+
+  return weatherMap.find(entry => code <= entry.max) ?? weatherMap[weatherMap.length - 1]
+}
+
 const getHomeData = unstable_cache(
   async (): Promise<{
     menuItems: Database['public']['Tables']['menu_items']['Row'][]
@@ -22,6 +48,7 @@ const getHomeData = unstable_cache(
     reviews: Database['public']['Tables']['reviews']['Row'][]
     totalMenuItems: number
     totalTables: number
+    weather: WeatherSnapshot | null
   }> => {
     if (!hasAdminSupabaseEnv()) {
       return {
@@ -30,22 +57,37 @@ const getHomeData = unstable_cache(
         reviews: [],
         totalMenuItems: 0,
         totalTables: 0,
+        weather: null,
       }
     }
 
     const supabase = createAdminClient()
+    const weatherPromise = fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.9175&longitude=107.6191&current=temperature_2m,weather_code&timezone=Asia%2FJakarta', {
+      next: { revalidate: 900 },
+    })
+      .then(response => response.json())
+      .then(data => {
+        const temp = Math.round(Number(data?.current?.temperature_2m))
+        const code = Number(data?.current?.weather_code)
+        if (Number.isNaN(temp) || Number.isNaN(code)) return null
+        return { ...mapWeather(code), temp }
+      })
+      .catch(() => null)
+
     const [
       { data: menuItems },
       { count: totalMenuItems },
       { data: gallery },
       { data: reviews },
       { count: totalTables },
+      weather,
     ] = await Promise.all([
       (supabase.from('menu_items').select('*', { count: 'exact' }).eq('is_featured', true).eq('is_available', true).order('sort_order') as any),
       (supabase.from('menu_items').select('*', { count: 'exact', head: true }) as any),
       (supabase.from('gallery_items').select('*').eq('is_active', true).order('sort_order').limit(8) as any),
       (supabase.from('reviews').select('*').eq('is_published', true).order('created_at', { ascending: false }).limit(3) as any),
       (supabase.from('floor_tables').select('*', { count: 'exact', head: true }).eq('is_active', true) as any),
+      weatherPromise,
     ])
     return {
       menuItems: (menuItems as Database['public']['Tables']['menu_items']['Row'][] | null) ?? [],
@@ -53,6 +95,7 @@ const getHomeData = unstable_cache(
       reviews: (reviews as Database['public']['Tables']['reviews']['Row'][] | null) ?? [],
       totalMenuItems: totalMenuItems ?? 0,
       totalTables: totalTables ?? 0,
+      weather,
     }
   },
   ['home_data'],
@@ -60,7 +103,7 @@ const getHomeData = unstable_cache(
 )
 
 export default async function HomePage() {
-  const [{ menuItems, gallery, reviews, totalMenuItems, totalTables }, site, lang] = await Promise.all([
+  const [{ menuItems, gallery, reviews, totalMenuItems, totalTables, weather }, site, lang] = await Promise.all([
     getHomeData(),
     getSiteData(),
     getPublicLang(),
@@ -82,9 +125,15 @@ export default async function HomePage() {
               >
                 {lang === 'id' ? (site.isOpen ? 'Buka Sekarang' : 'Tutup') : (site.isOpen ? 'Open Now' : 'Closed')}
               </span>
-              <div className="hero__weather" id="weatherBadge" title="Current weather in Bandung" data-title-en="Current weather in Bandung" data-title-id="Cuaca saat ini di Bandung">
-                <span id="wIcon">🌡️</span>
-                <span id="wTemp">—°C</span>
+              <div
+                className={`hero__weather${weather ? '' : ' is-loading'}`}
+                id="weatherBadge"
+                title={weather ? `${lang === 'id' ? weather.descId : weather.descEn} · ${weather.temp}°C · Bandung` : 'Current weather in Bandung'}
+                data-title-en="Current weather in Bandung"
+                data-title-id="Cuaca saat ini di Bandung"
+              >
+                <span id="wIcon">{weather?.icon ?? '⏳'}</span>
+                <span id="wTemp">{weather ? `${weather.temp}°C` : (lang === 'id' ? 'Memuat...' : 'Loading...')}</span>
                 <span id="wCity">Bandung</span>
               </div>
             </div>

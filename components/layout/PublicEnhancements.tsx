@@ -176,9 +176,25 @@ export default function PublicEnhancements() {
 
       const currentLang = document.documentElement.lang === 'id' ? 'id' : 'en'
       const cityLabel = 'Bandung'
-      const fallbackDayLabel = currentLang === 'id' ? 'Hari ini' : 'Today'
+      const loadingLabel = currentLang === 'id' ? 'Memuat...' : 'Loading...'
+      const fallbackTempLabel = currentLang === 'id' ? 'Cuaca Bandung' : 'Bandung Weather'
 
       ;(badge as HTMLElement).style.display = 'inline-flex'
+      badge.classList.add('is-loading')
+
+      const iconEl = document.getElementById('wIcon')
+      const tempEl = document.getElementById('wTemp')
+      const cityEl = document.getElementById('wCity')
+
+      if (tempEl && (!tempEl.textContent || tempEl.textContent.includes('—'))) {
+        tempEl.textContent = loadingLabel
+      }
+      if (iconEl && (!iconEl.textContent || iconEl.textContent === '🌡️')) {
+        iconEl.textContent = '⏳'
+      }
+      if (cityEl) {
+        cityEl.textContent = cityLabel
+      }
 
       try {
         const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.9175&longitude=107.6191&current=temperature_2m,weather_code&timezone=Asia%2FJakarta', { cache: 'no-store' })
@@ -198,22 +214,18 @@ export default function PublicEnhancements() {
           { max: 99, icon: '⛈️', descEn: 'Thunderstorm', descId: 'Badai Petir' },
         ]
         const match = map.find(entry => code <= entry.max) || map[map.length - 1]
-        const iconEl = document.getElementById('wIcon')
-        const tempEl = document.getElementById('wTemp')
-        const cityEl = document.getElementById('wCity')
         const desc = currentLang === 'id' ? match.descId : match.descEn
         if (iconEl) iconEl.textContent = match.icon
         if (tempEl) tempEl.textContent = `${temp}°C`
         if (cityEl) cityEl.textContent = cityLabel
         badge.setAttribute('title', `${desc} · ${temp}°C · ${cityLabel}`)
+        badge.classList.remove('is-loading')
       } catch {
-        const iconEl = document.getElementById('wIcon')
-        const tempEl = document.getElementById('wTemp')
-        const cityEl = document.getElementById('wCity')
         if (iconEl) iconEl.textContent = '☕'
-        if (tempEl) tempEl.textContent = cityLabel
-        if (cityEl) cityEl.textContent = fallbackDayLabel
+        if (tempEl) tempEl.textContent = fallbackTempLabel
+        if (cityEl) cityEl.textContent = cityLabel
         badge.setAttribute('title', cityLabel)
+        badge.classList.remove('is-loading')
       }
     }
 
