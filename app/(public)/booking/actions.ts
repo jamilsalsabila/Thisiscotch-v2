@@ -4,6 +4,24 @@ import { createClient } from '@/lib/supabase/server'
 import { generateCode } from '@/utils/format'
 import type { Database } from '@/types/database'
 
+const NON_BLOCKING_BOOKING_STATUSES = new Set([
+  '',
+  'cancelled',
+  'canceled',
+  'complete',
+  'completed',
+  'done',
+  'closed',
+  'expired',
+  'no-show',
+  'no_show',
+  'noshow',
+])
+
+function blocksTable(status: string | null | undefined) {
+  return !NON_BLOCKING_BOOKING_STATUSES.has(String(status ?? '').trim().toLowerCase())
+}
+
 export async function createBooking(data: {
   tableId: string
   section: Database['public']['Tables']['floor_tables']['Row']['section']
@@ -19,16 +37,6 @@ export async function createBooking(data: {
   const supabase = await createClient()
   const bookingCode = generateCode('COTCH')
 
-  // Keep legacy floorplan tables clickable even when floor_tables is incomplete.
-  const { error: tableError } = await (supabase.from('floor_tables') as any).upsert([{
-    id: data.tableId,
-    section: data.section,
-    capacity: data.capacity,
-    is_active: true,
-  }], { onConflict: 'id' })
-
-  if (tableError) return { success: false, error: tableError.message }
-
   if (data.bookingDate < new Date().toISOString().split('T')[0]) {
     return { success: false, error: 'Cannot book a past date.' }
   }
@@ -37,18 +45,19 @@ export async function createBooking(data: {
     return { success: false, error: `Party size exceeds table capacity (${data.capacity}).` }
   }
 
-  const { data: activeBookings } = await (supabase
+  const { data: activeBookings } = await ((supabase
     .from('bookings')
-    .select('table_id, booking_time')
+    .select('table_id, booking_time, status')
     .eq('booking_date', data.bookingDate)
-    .eq('table_id', data.tableId)
-    .eq('status', 'active') as any)
+    .eq('table_id', data.tableId)) as any)
 
   const requestedMinutes = toMinutes(data.bookingTime)
-  const overlaps = ((activeBookings as Array<{ booking_time: string }> | null) ?? []).some(booking => {
-    const existingMinutes = toMinutes(booking.booking_time)
-    return Math.abs(existingMinutes - requestedMinutes) < 120
-  })
+  const overlaps = ((activeBookings as Array<{ booking_time: string; status?: string | null }> | null) ?? [])
+    .filter(booking => blocksTable(booking.status))
+    .some(booking => {
+      const existingMinutes = toMinutes(booking.booking_time)
+      return Math.abs(existingMinutes - requestedMinutes) < 120
+    })
 
   if (overlaps) {
     return { success: false, error: 'This table is already booked for the selected time.' }
@@ -76,13 +85,13 @@ export async function createBooking(data: {
 
 export async function getBookedTableIds(date: string, time: string): Promise<string[]> {
   const supabase = await createClient()
-  const { data } = await (supabase
+  const { data } = await ((supabase
     .from('bookings')
-    .select('table_id, booking_time')
-    .eq('booking_date', date)
-    .eq('status', 'active') as any)
+    .select('table_id, booking_time, status')
+    .eq('booking_date', date)) as any)
   const requestedMinutes = toMinutes(time)
   return ((data as Array<{ table_id: string; booking_time: string }> | null) ?? [])
+    .filter(booking => blocksTable((booking as { status?: string | null }).status))
     .filter(booking => Math.abs(toMinutes(booking.booking_time) - requestedMinutes) < 120)
     .map(booking => booking.table_id)
 }

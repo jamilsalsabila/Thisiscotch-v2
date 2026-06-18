@@ -10,7 +10,7 @@ export default async function WaitlistPage() {
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Waitlist" data-copy-id="Daftar Tunggu">{lang === 'id' ? 'Daftar Tunggu' : 'Waitlist'}</div>
+          <div className="section-label" data-copy-en="When It's Full" data-copy-id="Saat Penuh">{lang === 'id' ? 'Saat Penuh' : 'When It’s Full'}</div>
           <h1 data-copy-en="Join the Waitlist" data-copy-id="Masuk Daftar Tunggu">{lang === 'id' ? 'Masuk Daftar Tunggu' : 'Join the Waitlist'}</h1>
           <p data-copy-en="All tables full? Get on the waitlist and we'll notify you when one opens up." data-copy-id="Semua meja penuh? Masuk daftar tunggu dan kami akan memberi tahu saat ada yang tersedia.">{lang === 'id' ? 'Semua meja penuh? Masuk daftar tunggu dan kami akan memberi tahu saat ada yang tersedia.' : 'All tables full? Get on the waitlist and we’ll notify you when one opens up.'}</p>
         </div>

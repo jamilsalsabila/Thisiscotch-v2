@@ -29,7 +29,7 @@ export default async function BookingPage() {
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Table Reservation" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Table Reservation'}</div>
+          <div className="section-label" data-copy-en="Choose Your Spot" data-copy-id="Pilih Tempatmu">{lang === 'id' ? 'Pilih Tempatmu' : 'Choose Your Spot'}</div>
           <h1 data-copy-en="Reserve Your Table" data-copy-id="Reservasi Meja">{lang === 'id' ? 'Reservasi Meja' : 'Reserve Your Table'}</h1>
           <p data-copy-en="Pick a table, choose your time, get your ticket." data-copy-id="Pilih meja, tentukan waktu, dan dapatkan tiketmu.">{lang === 'id' ? 'Pilih meja, tentukan waktu, dan dapatkan tiketmu.' : 'Pick a table, choose your time, get your ticket.'}</p>
         </div>

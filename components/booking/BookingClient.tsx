@@ -127,14 +127,21 @@ export default function BookingClient({ tables }: Props) {
 
   const fetchAvailability = useCallback(async (date: string, time: string) => {
     setLoadingAvail(true)
-    const ids = await getBookedTableIds(date, time)
-    setBookedIds(ids)
-    setLoadingAvail(false)
-    setTableId(null)
+    try {
+      const ids = await getBookedTableIds(date, time)
+      setBookedIds(ids)
+      setTableId(current => (current && ids.includes(current) ? null : current))
+    } finally {
+      setLoadingAvail(false)
+    }
   }, [])
 
-  function handleDateChange(d: string) { setDate(d); fetchAvailability(d, selectedTime) }
-  function handleTimeChange(t: string) { setTime(t); fetchAvailability(selectedDate, t) }
+  useEffect(() => {
+    void fetchAvailability(selectedDate, selectedTime)
+  }, [fetchAvailability, selectedDate, selectedTime])
+
+  function handleDateChange(d: string) { setDate(d) }
+  function handleTimeChange(t: string) { setTime(t) }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -171,6 +178,7 @@ export default function BookingClient({ tables }: Props) {
       name: form.name,
       partySize: Number(form.partySize),
     })
+    setBookedIds(current => current.includes(selectedTableId) ? current : [...current, selectedTableId])
     setForm({ name: '', phone: '', email: '', partySize: '2', specialRequest: '' })
   }
 

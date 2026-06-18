@@ -41,7 +41,7 @@ export default async function AboutPage() {
     <>
       <div className="page-hero">
         <div className="container">
-          <div className="section-label" data-copy-en="Our Story" data-copy-id="Cerita Kami">{lang === 'id' ? 'Cerita Kami' : 'Our Story'}</div>
+          <div className="section-label" data-copy-en="Inside Cotch" data-copy-id="Tentang Cotch">{lang === 'id' ? 'Tentang Cotch' : 'Inside Cotch'}</div>
           <h1 data-copy-en="Our Story" data-copy-id="Cerita Kami">{lang === 'id' ? 'Cerita Kami' : 'Our Story'}</h1>
           <p data-copy-en="Born from a love of great coffee and great people." data-copy-id="Lahir dari cinta terhadap kopi yang baik dan orang-orang yang baik.">{lang === 'id' ? 'Lahir dari cinta terhadap kopi yang baik dan orang-orang yang baik.' : 'Born from a love of great coffee and great people.'}</p>
         </div>
